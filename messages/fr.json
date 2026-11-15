@@ -1,0 +1,591 @@
+{
+  "metadata": {
+    "title": "Hanutek - Accessoires auto & gadgets",
+    "description": "Hanutek : accessoires et gadgets auto sélectionnés, livrés chez vous en 48 h."
+  },
+  "common": {
+    "close": "Fermer",
+    "dismissToast": "Fermer la notification",
+    "skipToContent": "Aller au contenu principal"
+  },
+  "navbar": {
+    "search": "Rechercher un produit",
+    "searchPlaceholder": "Rechercher un produit…",
+    "langLabel": "Choix de la langue",
+    "categories": "Catégories"
+  },
+  "dock": {
+    "label": "Navigation principale",
+    "menu": "Ouvrir la navigation",
+    "shop": "Accueil",
+    "catalogue": "Catalogue",
+    "favorites": "Favoris",
+    "favoritesCount": "{count} favoris",
+    "cart": "Panier",
+    "cartCount": "{count, plural, one {# article au panier} other {# articles au panier}}",
+    "account": "Compte"
+  },
+  "hero": {
+    "eyebrow": "Nouvelle sélection auto 2026",
+    "title": "Des essentiels",
+    "accent": "pour votre voiture.",
+    "subtitle": "Accessoires et gadgets auto sélectionnés avec soin. Livraison en 48 h et retours gratuits sous 30 jours.",
+    "cta": "Découvrir la sélection",
+    "stock": "En stock · expédié sous 24 h",
+    "trust": {
+      "delivery": "Livraison en 48 h",
+      "returns": "Retours sous 30 jours",
+      "payment": "Paiement sécurisé"
+    },
+    "deal": {
+      "label": "Offre de la semaine",
+      "title": "Caméra de recul HD avec guide de stationnement",
+      "cta": "Voir l'offre"
+    }
+  },
+  "home": {
+    "browseTitle": "Parcourir par catégorie",
+    "browseAll": "Tout le catalogue",
+    "serviceTitle": "Notre engagement",
+    "service": {
+      "delivery": {
+        "title": "Expédié sous 24 h",
+        "body": "Commande préparée le jour même avant 15 h."
+      },
+      "returns": {
+        "title": "Retours 30 jours",
+        "body": "Échange ou remboursement, étiquette comprise."
+      },
+      "warranty": {
+        "title": "Garantie 2 ans",
+        "body": "Sur toute la gamme, pièces et main-d'œuvre."
+      },
+      "support": {
+        "title": "Conseils d'installateurs",
+        "body": "Une équipe qui monte ces produits elle-même."
+      }
+    }
+  },
+  "products": {
+    "title": "Accessoires auto & gadgets",
+    "subtitle": "L'équipement voiture qu'on garderait pour nous : caméras, supports, rangement, entretien.",
+    "catalogueEyebrow": "Catalogue",
+    "catalogueTitle": "L'équipement qui change le quotidien.",
+    "catalogueSubtitle": "Tout pour la voiture, choisi avec soin : caméras, supports, rangement et entretien. Testé par notre équipe avant d'être proposé.",
+    "catalogueNote": "Sélection testée par notre équipe · retour gratuit sous 30 jours.",
+    "filters": "Filtres",
+    "filtersTitle": "Affiner la sélection",
+    "closeFilters": "Fermer les filtres",
+    "showResults": "Voir les {count} articles",
+    "categoryTitle": "Catégories",
+    "priceTitle": "Budget",
+    "ratingTitle": "Note clients",
+    "inStockOnly": "En stock uniquement",
+    "count": "{count, plural, one {# article} other {# articles}}",
+    "viewAll": "Voir les 12 produits",
+    "searchFor": "Résultats pour « {query} »",
+    "searchLabel": "Rechercher dans le catalogue",
+    "searchPlaceholder": "Caméra, support, gonfleur…",
+    "searchClear": "Effacer la recherche",
+    "noResults": "Aucun produit ne correspond à vos filtres.",
+    "noResultsHint": "Élargissez la fourchette de prix ou réinitialisez les filtres.",
+    "addToCart": "Ajouter au panier",
+    "addShort": "Ajouter",
+    "added": "Ajouté au panier",
+    "addedShort": "Ajouté",
+    "inCart": "Dans votre panier",
+    "inCartShort": "Au panier",
+    "soldOut": "Rupture de stock",
+    "soldOutShort": "Indisponible",
+    "priceLabel": "Prix",
+    "favorite": "Ajouter aux favoris",
+    "card": {
+      "reviews": "{count} avis",
+      "reviewed": "Note {value} sur 5, {count} avis",
+      "save": "-{percent} %"
+    },
+    "reset": "Réinitialiser",
+    "filterLabel": "Filtrer par catégorie",
+    "sortLabel": "Trier les produits",
+    "sortPrefix": "Trier :",
+    "sortFeatured": "Sélection",
+    "sortAsc": "Prix croissant",
+    "sortDesc": "Prix décroissant",
+    "facets": {
+      "priceLabel": "Fourchette de prix",
+      "pricePrefix": "Prix :",
+      "priceAll": "Tous les prix",
+      "under50": "Moins de 50 €",
+      "mid": "50 - 99 €",
+      "high": "100 € et plus",
+      "ratingLabel": "Note minimale",
+      "ratingPrefix": "Note :",
+      "ratingAll": "Toutes les notes",
+      "rating42": "4,2 et plus",
+      "rating45": "4,5 et plus",
+      "inStock": "En stock"
+    },
+    "badgeBest": "Meilleure vente",
+    "badgeBestShort": "Top vente",
+    "badgeNew": "Nouveau",
+    "badgePromo": "Promo",
+    "categories": {
+      "all": "Tout",
+      "cameras": "Caméras & recul",
+      "mounts": "Supports téléphone",
+      "storage": "Rangement & coffre",
+      "cleaning": "Nettoyage & entretien",
+      "lighting": "Éclairage LED",
+      "power": "Démarrage & diagnostic",
+      "interior": "Habitable"
+    },
+    "items": {
+      "p1": { "title": "Caméra de recul HD avec guide de stationnement" },
+      "p2": { "title": "Dash cam rétroviseur 1080P grand angle" },
+      "p3": { "title": "Support téléphone à ventouse pour tableau de bord" },
+      "p4": { "title": "Organiseur de coffre pliable 3 compartiments" },
+      "p5": { "title": "Organiseur de siège arrière à poches" },
+      "p6": { "title": "Aspirateur voiture sans fil 9000 Pa" },
+      "p7": { "title": "Lance mousse neige + 5 buses de lavage" },
+      "p8": { "title": "Kit ampoules LED H7 6000 K" },
+      "p9": { "title": "Démarreur d'urgence 12 V 3000 A" },
+      "p10": { "title": "Gonfleur portable à écran digital" },
+      "p11": { "title": "Valise diagnostic OBD2 et testeur batterie" },
+      "p12": { "title": "Housse de volant microfibre antidérapante" }
+    }
+  },
+  "product": {
+    "metaDescription": "{title} en stock chez Hanutek. Livraison en 48 h, retours sous 30 jours.",
+    "imageAlt": "{title}, vu de face sur fond neutre",
+    "photoNote": "Photo produit non retouchée",
+    "sku": "Réf. {value}",
+    "breadcrumbLabel": "Fil d'Ariane",
+    "crumbs": { "shop": "Boutique" },
+    "inStock": "En stock",
+    "outOfStock": "Rupture de stock",
+    "deliveryShort": "Livraison en 48 h",
+    "verifiedNote": "Avis laissés après un achat sur cet appareil.",
+    "youSave": "Vous économisez {value}",
+    "totalLabel": "Total",
+    "colorway": "Coloris",
+    "colors": {
+      "black": "Noir obsidienne",
+      "grey": "Gris graphite",
+      "light": "Gris clair",
+      "red": "Rouge surpiqué"
+    },
+    "allSpecs": "Toutes les caractéristiques",
+    "reviewsTitle": "{count} avis clients",
+    "verified": "Achat vérifié",
+    "daysAgo": "il y a {count, plural, one {# jour} other {# jours}}",
+    "relatedTitle": "Dans le même esprit",
+    "relatedBody": "Sélectionnés dans la même catégorie, puis dans le reste du catalogue.",
+    "trust": {
+      "delivery": {
+        "title": "Livraison 48 h",
+        "body": "Expédié depuis notre dépôt d'Île-de-France."
+      },
+      "warranty": {
+        "title": "Garantie 2 ans",
+        "body": "Pièces, main-d'œuvre et retour pris en charge."
+      },
+      "returns": {
+        "title": "Retours 30 jours",
+        "body": "Remboursé ou échangé, sans justification."
+      }
+    },
+    "specs": {
+      "resolution": "Définition",
+      "viewingAngle": "Angle de vision",
+      "protection": "Étanchéité",
+      "voltage": "Tension",
+      "cableLength": "Câble",
+      "included": "Dans la boîte",
+      "screen": "Écran",
+      "storage": "Stockage",
+      "deviceSize": "Taille d'appareil",
+      "mount": "Fixation",
+      "rotation": "Orientation",
+      "material": "Matériau",
+      "capacity": "Capacité",
+      "compartments": "Compartiments",
+      "dimensions": "Dimensions",
+      "foldable": "Pliable",
+      "pockets": "Poches",
+      "nozzles": "Buses",
+      "connection": "Raccordement",
+      "suction": "Aspiration",
+      "battery": "Batterie",
+      "runTime": "Autonomie",
+      "weight": "Poids",
+      "maxPressure": "Pression max",
+      "accuracy": "Précision",
+      "socket": "Culot",
+      "temperature": "Température",
+      "power": "Puissance",
+      "lifespan": "Durée de vie",
+      "peakCurrent": "Courant de pointe",
+      "protocols": "Protocoles",
+      "modes": "Modes de diagnostic",
+      "batteryTest": "Test batterie",
+      "diameter": "Diamètre",
+      "grip": "Adhérence",
+      "fit": "Montage",
+      "care": "Entretien"
+    },
+    "descriptions": {
+      "p1": "Une caméra wide qui se voit dans le rétroviseur intérieur dès la marche arrière, avec des repères de stationnement réglables selon la hauteur de votre pare-chocs.",
+      "p2": "Dash cam et rétroviseur en un seul bloc : l'enregistrement se déclenche au contact, l'écran bascule en split quand vous passez en recul.",
+      "p3": "Une ventouse large qui tient sur un tableau de bord texturé, avec un bras qui ne masque ni la clim ni le capteur de lumière.",
+      "p4": "Un coffre rangé en trois blocs qui restent droits en virage. Une fois vide, il se plie à l'épaisseur d'un manuel.",
+      "p5": "Des poches solides derrière les sièges avant : bouteilles, lingettes, câbles et jouets restent à portée de la banquette.",
+      "p6": "Aspiration sans fil avec deux batteries, filtre lavable et deux becs. Suffisant pour une habitacle complet sans reprendre de charge.",
+      "p7": "Un lance mousse qui couvre le véhicule d'une neige épaisse, avec cinq buses pour passer du châssis au vitrage sans changer de matériel.",
+      "p8": "Deux ampoules LED 6000 K au culot H7, faisceau sans voyant d'erreur. Le faisceau d'origine reste dans le coffre.",
+      "p9": "Une batterie de secours qui redémarre un moteur essence à plat et sert de powerbank, avec compresseur intégré et câbles protégés.",
+      "p10": "Un gonfleur digital qui coupe à la pression que vous réglez, assez petit pour rester à demeure dans le coffre.",
+      "p11": "Liseuse de codes moteur et testeur de batterie en un boîtier, avec lecture des données en direct sur la plupart des véhicules post-2001.",
+      "p12": "Une housse microfibre qui rajeunit un volant fatigué et garde sa prise en main par temps humide."
+    },
+    "highlights": {
+      "p1": {
+        "guidelines": "Repères de stationnement réglables en hauteur",
+        "night": "Image nette de nuit, infrarouge automatique",
+        "install": "Câble 5 m et trous de passage prévus"
+      },
+      "p2": {
+        "mirror": "Fonctionne comme un rétroviseur ordinaire",
+        "loop": "Bouclage automatique sur carte 32 Go",
+        "screen": "Écran 4,3 pouces inclinable"
+      },
+      "p3": {
+        "suction": "Ventouse large qui tient sur plastique texturé",
+        "rotation": "Rotation 360° à une main",
+        "hands": "Mains libres pour le GPS et les appels"
+      },
+      "p4": {
+        "foldable": "Se plie à 4 cm une fois vide",
+        "compartments": "Trois blocs amovibles",
+        "trunk": "Base rigide qui reste droite en virage"
+      },
+      "p5": {
+        "pockets": "Six poches de tailles différentes",
+        "seats": "Sangle sur appuie-tête, aucune perceuse",
+        "water": "Enduit déperlant essuyable"
+      },
+      "p6": {
+        "wireless": "Deux batteries, 22 minutes d'aspiration",
+        "power": "9000 Pa assez forts pour la moquette",
+        "filters": "Filtre lavable, becs inclus"
+      },
+      "p7": {
+        "foam": "Mousse épaisse qui reste en place",
+        "nozzles": "Cinq jets, du châssis au vitrage",
+        "rinse": "Rinçage complet en une minute"
+      },
+      "p8": {
+        "beam": "Faisceau régulier, pas d'éblouissement",
+        "plug": "Branchement direct sur le culot H7",
+        "canbus": "Sans voyant au tableau de bord"
+      },
+      "p9": {
+        "start": "Redémarre un essence à plat jusqu'à 6 L",
+        "compressor": "Compresseur intégré pour les pneus",
+        "safety": "Câbles inversés protégés, boîtier isolé"
+      },
+      "p10": {
+        "preset": "Pression cible réglée à 0,1 bar",
+        "autoStop": "Coupe et s'arrête dès la valeur atteinte",
+        "nozzle": "Trois embouts, dont ballon et matelas"
+      },
+      "p11": {
+        "codes": "Lecture et effacement des voyants moteur",
+        "battery": "Test de charge et de batterie 12 V",
+        "live": "Capteurs en direct pendant la lecture"
+      },
+      "p12": {
+        "grip": "Microfibre qui reste sèche en main",
+        "stitch": "Coutures doublées aux points d'appui",
+        "fit": "Ajustement universel 38 cm"
+      }
+    },
+    "reviews": {
+      "r1": "Installée en vingt minutes, les repères se règlent depuis le boîtier. On voit les bornes basses la nuit sans allumer les feux.",
+      "r2": "Remplace mon ancienne dash cam et le rétroviseur. Le split screen en recul est vraiment lisible, l'écran est plus grand que prévu.",
+      "r3": "Ventouse toujours en place après deux étés derrière un pare-brise. Le bras ne bouge pas sur route cassée.",
+      "r4": "Trois compartiments, le coffre ne ressemble plus à un sac. Plié, il glisse sous la planche du break.",
+      "r5": "Aspiration correcte sur la moquette velours, deux charges suffisent pour la voiture entière. Le filtre se rince en dix secondes.",
+      "r6": "Bonne mousse mais le raccord rapide demande un tuyau bien droit. Une fois monté, c'est très confortable."
+    }
+  },
+  "cart": {
+    "title": "Panier",
+    "subtitle": "Vos articles sont réservés pendant 30 minutes.",
+    "itemsTitle": "Vos articles",
+    "secureNote": "Paiement sécurisé, données chiffrées",
+    "keepShoppingNote": "La livraison se choisit à l'étape suivante.",
+    "assureDelivery": "Expédié sous 24 h ouvrées",
+    "assureReturns": "Retour gratuit sous 30 jours",
+    "count": "{count, plural, one {# article} other {# articles}}",
+    "quantity": "Quantité",
+    "quantityFor": "Quantité pour {title}",
+    "increase": "Augmenter la quantité",
+    "decrease": "Diminuer la quantité",
+    "colorway": "Coloris : {color}",
+    "eachQty": "×{qty}",
+    "lineTotal": "Sous-total de la ligne",
+    "remove": "Retirer {title} du panier",
+    "undo": "Annuler",
+    "removedToast": "{title} retiré du panier",
+    "soldOutLine": "Rupture de stock : retirez cet article pour passer commande.",
+    "emptyTitle": "Votre panier est vide",
+    "emptyBody": "Ajoutez un accessoire et il apparaîtra ici, coloris et quantité compris.",
+    "browseCatalogue": "Parcourir le catalogue",
+    "summary": "Récapitulatif",
+    "subtotal": "Sous-total · {count, plural, one {# article} other {# articles}}",
+    "discount": "Remise {code}",
+    "shipping": "Livraison {method}",
+    "shippingFree": "Offerte",
+    "total": "Total",
+    "vatNote": "Tous les prix sont en euros, TVA incluse.",
+    "freeShippingLeft": "{value} de plus pour la livraison offerte",
+    "freeShippingWon": "Livraison standard offerte sur cette commande",
+    "methods": {
+      "standard": { "short": "standard" },
+      "express": { "short": "express" },
+      "pickup": { "short": "en point relais" }
+    },
+    "promoLabel": "Code promo",
+    "promoPlaceholder": "Code promo",
+    "promoApply": "Appliquer",
+    "promoActive": "Code {code} appliqué",
+    "promoRemove": "Retirer",
+    "promoUnknown": "Ce code n'existe pas encore.",
+    "promoMin": "Commande minimum de {value} pour ce code.",
+    "promoApplied": "Code {code} appliqué au panier",
+    "checkout": "Passer la commande",
+    "addToCart": "Ajouter au panier",
+    "emptyCart": "Vider le panier",
+    "emptied": "Panier vidé",
+    "keepShopping": "Continuer mes achats",
+    "added": "Ajouté",
+    "addedToast": "{title} ajouté au panier",
+    "unavailable": "Indisponible",
+    "viewCart": "Voir le panier"
+  },
+  "checkout": {
+    "metaTitle": "Paiement - Hanutek",
+    "metaDescription": "Trois étapes pour finaliser votre commande Hanutek.",
+    "title": "Finaliser la commande",
+    "subtitle": "Aucun compte nécessaire. Vos informations restent sur cet appareil.",
+    "eyebrow": "Commande sécurisée",
+    "secure": "Paiement 100 % sécurisé",
+    "freeShippingLeft": "Plus que {value} pour la livraison offerte",
+    "freeShippingWon": "Livraison offerte sur cette commande",
+    "backToCart": "Retour au panier",
+    "cancel": "Annuler",
+    "continueToShipping": "Continuer vers la livraison",
+    "continueToPayment": "Continuer vers le paiement",
+    "demoNote": "Parcours de démonstration : aucun paiement n'est effectué et aucune donnée n'est transmise. Les commandes restent enregistrées dans ce navigateur.",
+    "steps": {
+      "contact": "Coordonnées",
+      "shipping": "Livraison",
+      "payment": "Paiement",
+      "contactHint": "Comment vous joindre pour confirmer la commande.",
+      "shippingHint": "Adresse et délai de livraison.",
+      "paymentHint": "Dernière étape, puis votre commande part en préparation."
+    },
+    "guestHint": "Utilisé uniquement pour la confirmation de commande.",
+    "phoneHint": "Le transporteur appelle si l'adresse est difficile.",
+    "optional": "Facultatif",
+    "fields": {
+      "email": "E-mail",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "address2": "Complément d'adresse",
+      "postal": "Code postal",
+      "city": "Ville",
+      "holder": "Titulaire de la carte",
+      "card": "Numéro de carte",
+      "expiry": "Expiration",
+      "cvc": "Cryptogramme"
+    },
+    "method": "Mode de livraison",
+    "free": "Offerte",
+    "freeShippingNote": "Livraison standard offerte à partir de {value} d'articles.",
+    "methods": {
+      "standard": {
+        "title": "Standard",
+        "eta": "Chez vous sous 2 jours ouvrés"
+      },
+      "express": {
+        "title": "Express",
+        "eta": "Demain avant 13 h"
+      },
+      "pickup": {
+        "title": "Point relais",
+        "eta": "Disponible en 24 h dans le relais choisi"
+      }
+    },
+    "cardHint": "Format 16 chiffres, sans espaces à saisir.",
+    "expiryPlaceholder": "MM/AA",
+    "terms": "J'accepte les conditions de vente et la garantie de 2 ans.",
+    "termsNote": "Nécessaire pour valider la commande.",
+    "pay": "Payer {value}",
+    "payIncomplete": "Complétez les champs de paiement pour continuer.",
+    "payNeedsTerms": "Cochez les conditions de vente pour payer.",
+    "secureNote": "Paiement chiffré, aucune donnée de carte conservée.",
+    "summary": "Votre commande",
+    "edit": "Modifier",
+    "assure": {
+      "1": "Expédié sous 24 h ouvrées",
+      "2": "Retour gratuit pendant 30 jours",
+      "3": "Garantie 2 ans incluse"
+    },
+    "loginPrompt": "Un compte Hanutek enregistre vos adresses et vos commandes.",
+    "loginHere": "Se connecter",
+    "savedAddressNote": "Adresse et articles seront enregistrés sur votre compte.",
+    "addressLabel": "Adresse de commande",
+    "confirmedToast": "Commande enregistrée",
+    "emptyBody": "Votre panier vient de se vider. Ajoutez un article pour accéder au paiement.",
+    "errors": {
+      "required": "Ce champ est obligatoire.",
+      "invalid": "Le format n'est pas valide.",
+      "past": "Cette date est déjà passée.",
+      "tooShort": "Trop court."
+    }
+  },
+  "order": {
+    "metaTitle": "Commande confirmée - Hanutek",
+    "title": "Commande confirmée",
+    "eyebrow": "Commande envoyée",
+    "body": "Merci {name}. Nous préparons vos articles.",
+    "reference": "Référence",
+    "timeline": {
+      "1": "Confirmée",
+      "2": "Préparée",
+      "3": "Expédiée",
+      "4": "Livrée"
+    },
+    "eta": "Livraison estimée le {date}",
+    "etaPickup": "À retirer au relais dès le {date}",
+    "itemsTitle": "{count, plural, one {# article} other {# articles}} commandés",
+    "deliveryTitle": "Adresse de livraison",
+    "paymentTitle": "Paiement",
+    "browse": "Continuer mes achats",
+    "account": "Mon compte",
+    "missingTitle": "Commande introuvable sur cet appareil",
+    "missingBody": "Les commandes de cette démo sont enregistrées localement. Ouvrez cette page depuis le navigateur qui a passé la commande.",
+    "methods": {
+      "standard": { "title": "Standard" },
+      "express": { "title": "Express" },
+      "pickup": { "title": "Point relais" }
+    }
+  },
+  "auth": {
+    "title": "Se connecter à Hanutek",
+    "body": "Retrouvez vos commandes, vos adresses et vos favoris sur n'importe quel appareil.",
+    "eyebrow": "Espace client",
+    "backToShop": "Retour à la boutique",
+    "secureNote": "Connexion chiffrée sur cet appareil",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "passwordHint": "6 caractères minimum.",
+    "submit": "Se connecter",
+    "demoNote": "Mode démonstration : aucun compte réel n'est créé et aucune donnée ne quitte votre navigateur. Saisissez n'importe quel e-mail valide et un mot de passe de 6 caractères.",
+    "welcome": "Bonjour {name}, vous êtes connecté.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "errors": {
+      "required": "Ce champ est obligatoire.",
+      "invalid": "Le format n'est pas valide."
+    },
+    "asideTitle": "Ce que garde votre compte",
+    "aside": {
+      "1": "Adresses et délais de livraison enregistrés",
+      "2": "Historique de commandes et garanties",
+      "3": "Favoris partagés entre appareils"
+    }
+  },
+  "account": {
+    "eyebrow": "Compte",
+    "hello": "Bonjour {name}",
+    "memberSince": "Client depuis {date}",
+    "signOut": "Se déconnecter",
+    "signedOut": "Vous êtes déconnecté.",
+    "orders": "Commandes",
+    "ordersCount": "{count, plural, one {# commande} other {# commandes}}",
+    "statsOrders": "Commandes",
+    "statsFavorites": "Favoris",
+    "statsAddresses": "Adresses",
+    "defaultAddress": "Par défaut",
+    "browseLink": "Catalogue",
+    "noOrders": "Aucune commande pour l'instant",
+    "noOrdersBody": "Vos commandes passées sur cet appareil s'afficheront ici, avec leur suivi.",
+    "startShopping": "Voir le catalogue",
+    "status": {
+      "processing": "En préparation",
+      "shipped": "Expédiée",
+      "delivered": "Livrée"
+    },
+    "orderItems": "{count, plural, one {# article} other {# articles}}",
+    "addresses": "Adresses enregistrées",
+    "shortcut": "Raccourcis",
+    "favoritesLink": "Mes favoris",
+    "ordersLink": "Mes commandes",
+    "privacyNote": "Cette démo ne transmet rien à un serveur : tout est stocké dans le stockage local de votre navigateur."
+  },
+  "favorites": {
+    "title": "Mes favoris",
+    "count": "{count, plural, one {# article suivi} other {# articles suivis}}",
+    "clear": "Tout retirer",
+    "emptyTitle": "Aucun favori pour l'instant",
+    "emptyBody": "Touchez le cœur sur une fiche produit pour la retrouver ici.",
+    "browse": "Parcourir le catalogue",
+    "crossSellTitle": "Un favori n'est pas encore dans votre panier.",
+    "crossSellBody": "Ajoutez-le maintenant : la livraison est offerte dès 60 € d'achat."
+  },
+  "footer": {
+    "tagline": "Des accessoires durables, choisis à la main et livrés avec soin.",
+    "social": "Suivez-nous",
+    "shop": "Boutique",
+    "shopLinks": {
+      "all": "Tous les produits",
+      "new": "Nouveautés",
+      "best": "Meilleures ventes",
+      "gift": "Cartes cadeaux"
+    },
+    "help": "Aide",
+    "helpLinks": {
+      "shipping": "Livraison",
+      "returns": "Retours",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "company": "Entreprise",
+    "companyLinks": {
+      "about": "À propos",
+      "careers": "Carrières",
+      "partners": "Partenaires",
+      "press": "Presse"
+    },
+    "legal": "Légal",
+    "legalLinks": {
+      "privacy": "Confidentialité",
+      "terms": "Conditions de vente",
+      "cookies": "Cookies",
+      "notice": "Mentions légales"
+    },
+    "news": "Newsletter",
+    "newsTitle": "Nos offres avant tout le monde.",
+    "newsText": "Une sélection courte, des offres utiles. Pas de spam, désinscription en un clic.",
+    "placeholder": "Votre e-mail",
+    "submit": "S'inscrire",
+    "thanks": "Merci, à très vite !",
+    "payments": "Paiement",
+    "rights": "Tous droits réservés.",
+    "backToTop": "Retour en haut"
+  }
+}

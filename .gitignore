@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/shots/qa
 
 # next.js
 /.next/
@@ -39,3 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local agent scratch output and QA screenshots
+/.qwen/tmp/
+/shots/

@@ -1,26 +1,361 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Hanutek brand system — values taken from hanutek_graphic_chart_brand_system.html */
+  --color-primary: #2563eb;
+  --color-primary-deep: #1d4ed8;
+  --color-soft-blue: #eff6ff;
+  --color-obsidian: #0f172a;
+  --color-slate: #64748b;
+  --color-sale: #dc2626;
+  --color-success: #10b981;
+  /* AA-compliant variant for filled surfaces and small text; #10b981 fails 4.5:1 on white */
+  --color-success-deep: #047857;
+  --color-line: #e2e8f0;
+  --color-canvas: #f8fafc;
+  --color-well: #f1f5f9;
+
+  --font-sans: var(--font-general-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Shape scale. One documented rule, applied everywhere:
+     cards 4px · controls (buttons, inputs, chips) 3px · sheets & panels 20px · pills full. */
+  --radius-card: 4px;
+  --radius-control: 3px;
+  --radius-panel: 20px;
+  --radius-pill: 999px;
+
+  /* Layer scale. Only these five values are ever used for stacking contexts. */
+  --z-appbar: 40;
+  --z-dock: 45;
+  --z-sheet: 60;
+  --z-sheet-content: 61;
+  --z-toast: 70;
+
+  /* Elevation, tinted to the obsidian canvas rather than pure black. */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-lift: 0 22px 40px -28px rgba(15, 23, 42, 0.45);
+  --shadow-float: 0 18px 45px -18px rgba(15, 23, 42, 0.28);
+  --shadow-sheet: 0 -24px 64px -24px rgba(15, 23, 42, 0.42);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ------------------------------------------------------------------ *
+   * Application surfaces — 2026-11-14 redesign.
+   *
+   * A separate token family on purpose: the home page keeps the original
+   * sharp automotive tokens above, while catalogue, product, cart,
+   * checkout, account and auth move to the softer, friendlier language.
+   * ------------------------------------------------------------------ */
+  --color-ink: #101828;
+  --color-muted: #667085;
+  --color-brand: #2f6bff;
+  --color-brand-deep: #1f54df;
+  --color-brand-soft: #eef3ff;
+  --color-brand-tint: #f7f9ff;
+  --color-mint: #12b76a;
+  --color-mint-deep: #06764a;
+  --color-mint-soft: #e9f9f1;
+  --color-hairline: #e6ebf3;
+  --color-mist: #f4f7fc;
+
+  --radius-soft: 18px;
+  --radius-soft-sm: 12px;
+  --radius-sheet: 28px;
+
+  --shadow-soft:
+    0 1px 2px rgba(16, 24, 40, 0.04),
+    0 12px 32px -24px rgba(16, 24, 40, 0.24);
+  --shadow-pop:
+    0 2px 6px rgba(16, 24, 40, 0.04),
+    0 28px 60px -28px rgba(16, 24, 40, 0.3);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility display-cut {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Tabular figures for every money, quantity and countdown value in the app. */
+@utility num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Skeleton shimmer. One keyframe, used only by components/ui/Skeleton. */
+@keyframes hanutek-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+    /* Reserving the gutter keeps the layout still while a sheet hides the scrollbar. */
+    overflow-x: clip;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Nothing interactive may fall back to the UA font or the UA cursor. */
+  button,
+  input,
+  select,
+  textarea,
+  optgroup,
+  legend {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [data-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  input,
+  textarea,
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  select::-ms-expand {
+    display: none;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    -webkit-appearance: none;
+    display: none;
+  }
+
+  ::-ms-reveal {
+    display: none;
+  }
+
+  ::placeholder {
+    color: color-mix(in oklab, var(--color-slate) 85%, transparent);
+    opacity: 1;
+  }
+
+  /* Chrome's yellow autofill is the last uncontrolled browser surface in the app. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-obsidian);
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    caret-color: var(--color-obsidian);
+    transition: background-color 99999s ease-in-out 0s;
+  }
+
+  ::-webkit-details-marker {
+    display: none;
+  }
+
+  summary {
+    display: block;
+    list-style: none;
+  }
+
+  dialog {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    max-width: none;
+    max-height: none;
+  }
+
+  progress,
+  meter {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    background: var(--color-line);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd,
+  ul,
+  ol,
+  fieldset {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul,
+  ol,
+  menu {
+    list-style: none;
+  }
+
+  fieldset {
+    border: 0;
+    min-width: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  picture,
+  video,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    height: 0;
+  }
+
+  mark {
+    background: var(--color-soft-blue);
+    color: inherit;
+    padding: 0 0.15em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+
+  /* Thin, brand-neutral scrollbars wherever one is genuinely scrollable. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-slate) 45%, transparent);
+    background-clip: content-box;
+  }
+
+  /* Applied to <html> while any sheet is open. */
+  html.sheet-open {
+    overflow: hidden;
+    scroll-behavior: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

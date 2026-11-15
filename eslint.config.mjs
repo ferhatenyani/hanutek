@@ -12,6 +12,14 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Bundled agent skill tooling (CommonJS scripts, not app code):
+    ".agents/**",
+    // Session scratch space and QA screenshots:
+    ".qwen/**",
+    "shots/**",
+    // Verbatim copies of the shared component library in work/utils/components.
+    // Vendored as-is, so they are not reformat-linted here.
+    "components/ui/library/**",
   ]),
 ]);
 
