@@ -1,24 +1,26 @@
 "use client";
 
-import { Check, Heart, ShoppingCart, Star } from "@phosphor-icons/react";
+import { Check, Heart, ShoppingCart } from "@phosphor-icons/react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
-import { pseudoRating, savingsOf, swatchesOf } from "./meta";
+import { memo, useId } from "react";
+import { savingsOf } from "./meta";
 import { useCardCart } from "./useCardCart";
 import type { Product } from "@/lib/products";
 
 const BADGE_CLASS = {
-  best: "bg-obsidian text-white",
-  new: "bg-primary text-white",
+  best: "bg-ink text-white",
+  new: "bg-blue text-white",
   promo: "bg-sale text-white",
 } as const;
 
-// Production product card for automotive accessories. Square-cut shape language:
-// 4px card radius, full-bleed media with no outer margin, 3px CTA. Essential
-// attributes only (title, rating, variants, price, one CTA); calm lift on hover.
-// The card sits on a white section, so separation is border + shadow, not a tint.
-export default function ProductCard({
+/**
+ * The single production card, shared by home rails, catalogue and favourites.
+ * 12px roundness, small title, gray description with a full-text tooltip,
+ * price and one add-to-cart CTA. No ratings, no variant swatches.
+ */
+function ProductCard({
   product,
   title,
   price,
@@ -30,17 +32,20 @@ export default function ProductCard({
   oldPrice?: string;
 }) {
   const t = useTranslations("products");
+  const td = useTranslations("product");
   const locale = useLocale();
   const href = `/${locale}/product/${product.id}`;
-  const { fav, added, inCart, addToCart, toggleFav } = useCardCart(product, title);
-  const { rating, reviews } = pseudoRating(product);
+  const { fav, added, inCart, addToCart, toggleFav } = useCardCart(product);
   const savings = savingsOf(product);
-  const swatches = swatchesOf(product);
+  const description = td(`descriptions.${product.id}` as "descriptions.p1");
+  const descId = useId();
   const badge = product.badge
     ? {
         cls: BADGE_CLASS[product.badge],
         label: t(
-          `badge${product.badge[0].toUpperCase()}${product.badge.slice(1)}` as "badgeNew",
+          (product.badge === "best"
+            ? "badgeBestShort"
+            : `badge${product.badge[0].toUpperCase()}${product.badge.slice(1)}`) as "badgeNew",
         ),
       }
     : null;
@@ -48,21 +53,21 @@ export default function ProductCard({
   return (
     <article
       data-testid="product-card"
-      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-white shadow-card transition-[transform,border-color,box-shadow] duration-300 ease-out-quint hover:border-obsidian/25 hover:shadow-lift motion-safe:hover:-translate-y-0.5"
+      className="group flex h-full flex-col overflow-hidden rounded-card border border-line bg-white shadow-card transition-[transform,border-color,box-shadow] duration-300 ease-out-quint hover:border-ink/20 hover:shadow-lift motion-safe:hover:-translate-y-0.5"
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-canvas ring-1 ring-inset ring-obsidian/[0.07]">
+      <div className="relative aspect-square w-full overflow-hidden bg-mist">
         <Link
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className="block h-full w-full"
+          className="relative block h-full w-full"
         >
           <Image
             src={product.image}
             alt=""
             fill
             sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 280px"
-            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:scale-[1.04]"
+            className="object-cover transition-transform duration-500 ease-out-quint motion-safe:group-hover:scale-[1.04]"
           />
         </Link>
 
@@ -79,7 +84,7 @@ export default function ProductCard({
           onClick={toggleFav}
           aria-pressed={fav}
           aria-label={t("favorite")}
-          className="absolute end-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-control bg-white/95 text-slate ring-1 ring-obsidian/10 transition-colors hover:text-sale before:absolute before:-inset-1.5 before:content-['']"
+          className="absolute end-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-control bg-white/95 text-muted ring-1 ring-ink/10 transition-colors hover:text-sale before:absolute before:-inset-1.5 before:content-['']"
         >
           <Heart
             size={15}
@@ -91,63 +96,49 @@ export default function ProductCard({
       </div>
 
       <div className="flex flex-1 flex-col px-3.5 pb-3.5 pt-3">
-        <h3 className="line-clamp-2 text-balance text-[14px] font-semibold leading-[1.35] tracking-[-0.015em] text-obsidian">
-          <Link href={href} className="transition-colors hover:text-primary">
+        <h3 className="line-clamp-2 text-[13px] font-semibold leading-[1.35] tracking-[-0.01em] text-ink">
+          <Link href={href} className="transition-colors hover:text-blue">
             {title}
           </Link>
         </h3>
 
-        <div className="mt-2 flex items-center gap-1.5">
-          <span className="flex items-center gap-px" aria-hidden="true">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <Star
-                key={i}
-                size={12}
-                weight={i < Math.round(rating) ? "fill" : "regular"}
-                className={i < Math.round(rating) ? "text-obsidian" : "text-slate/35"}
-              />
-            ))}
-          </span>
-          <span dir="ltr" className="text-[12px] font-semibold tabular-nums text-obsidian">
-            {rating.toFixed(1)}
-          </span>
-          <span className="truncate text-[12px] text-slate">
-            {t("card.reviews", { count: reviews })}
+        <div
+          tabIndex={0}
+          aria-describedby={descId}
+          className="group/desc relative mt-1 cursor-help rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-blue/40"
+        >
+          <p className="line-clamp-2 text-[12px] leading-[1.45] text-muted">
+            {description}
+          </p>
+          <span
+            id={descId}
+            role="tooltip"
+            className="pointer-events-none absolute bottom-full start-0 z-20 mb-1.5 w-[230px] rounded-control bg-ink px-3 py-2 text-[11px] leading-relaxed text-white opacity-0 shadow-pop transition-opacity duration-150 group-hover/desc:opacity-100 group-focus-visible/desc:opacity-100"
+          >
+            {description}
           </span>
         </div>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-3.5">
-          <span dir="ltr" className="text-[16px] font-semibold tabular-nums tracking-[-0.01em] text-obsidian">
+        <div className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1.5 pt-3">
+          <span dir="ltr" className="num text-[15px] font-semibold tracking-[-0.01em] text-ink">
             {price}
           </span>
           {oldPrice && (
-            <span dir="ltr" className="text-[12px] tabular-nums text-slate line-through">
+            <span dir="ltr" className="num text-[12px] text-faint line-through">
               {oldPrice}
             </span>
           )}
           {savings !== null && (
-            <span className="rounded-control bg-sale/10 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-sale">
+            <span className="num rounded-control bg-sale-soft px-1.5 py-0.5 text-[10px] font-semibold text-sale">
               {t("card.save", { percent: savings })}
             </span>
           )}
-          <span className="ms-auto flex items-center gap-1.5">
-            {swatches.map((swatch, i) => (
-              <span
-                key={i}
-                aria-hidden="true"
-                className={`h-3.5 w-3.5 rounded-full ring-1 ring-inset ring-obsidian/10 transition-transform duration-200 motion-safe:group-hover:scale-110 ${swatch}`}
-              />
-            ))}
-            <span className="text-[10px] font-medium tabular-nums text-slate">
-              +{swatches.length}
-            </span>
-          </span>
         </div>
 
         <button
           type="button"
           data-testid="card-add"
-          onClick={addToCart}
+          onClick={(event) => addToCart(event.currentTarget)}
           disabled={!product.inStock}
           aria-label={
             !product.inStock
@@ -160,16 +151,16 @@ export default function ProductCard({
           }
           className={`mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-control text-[13px] font-semibold tracking-[0.01em] transition-colors duration-200 ${
             !product.inStock
-              ? "cursor-not-allowed border border-line bg-canvas text-slate"
+              ? "cursor-not-allowed border border-line bg-mist text-faint"
               : added
-                ? "border border-obsidian bg-white text-obsidian"
-                : "bg-obsidian text-white hover:bg-obsidian/90"
+                ? "border border-ink bg-white text-ink"
+                : "bg-blue text-white hover:bg-blue-deep"
           }`}
         >
           <ShoppingCart size={15} weight="bold" aria-hidden="true" />
           <span className="flex items-center gap-1.5">
             {added && product.inStock && (
-              <Check size={14} weight="bold" aria-hidden="true" className="text-success-deep" />
+              <Check size={14} weight="bold" aria-hidden="true" className="text-success" />
             )}
             {product.inStock
               ? inCart
@@ -184,3 +175,5 @@ export default function ProductCard({
     </article>
   );
 }
+
+export default memo(ProductCard);

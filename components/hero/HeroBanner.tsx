@@ -1,180 +1,208 @@
 "use client";
 
-import {
-  ArrowClockwise,
-  ArrowRight,
-  ShieldCheck,
-  Truck,
-} from "@phosphor-icons/react";
+import { ArrowRight, CaretLeft, CaretRight, ShieldCheck, Truck, Money } from "@phosphor-icons/react";
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
+import { useState } from "react";
+import PaginationDots from "@/components/ui/PaginationDots";
+import { formatDA } from "@/lib/money";
+import { EASE } from "@/lib/motion";
 import { products } from "@/lib/products";
-import { DUR, EASE } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
-const TRUST_ICONS = [Truck, ArrowClockwise, ShieldCheck];
+const TRUST = [
+  { Icon: Truck, key: "delivery" },
+  { Icon: Money, key: "payment" },
+  { Icon: ShieldCheck, key: "returns" },
+] as const;
 
+/**
+ * Mobile-first promo deck: two swipeable slides (brand promise, featured deal)
+ * with pagination dots and edge arrows. The same deck widens on desktop
+ * instead of switching to a different layout.
+ */
 export default function HeroBanner() {
   const t = useTranslations("hero");
   const tp = useTranslations("products");
   const locale = useLocale();
   const reduced = useReducedMotion();
+  const [index, setIndex] = useState(0);
 
   const feature = products.find((p) => p.id === "p2") ?? products[1];
   const deal = products.find((p) => p.id === "p1") ?? products[0];
-
-  const format = new Intl.NumberFormat(locale === "ar" ? "ar-MA" : "fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
   const discount = deal.oldPrice
-    ? `−${Math.round((1 - deal.price / deal.oldPrice) * 100)}${locale === "ar" ? "٪" : " %"}`
+    ? Math.round((1 - deal.price / deal.oldPrice) * 100)
     : null;
 
-  const trust = [t("trust.delivery"), t("trust.returns"), t("trust.payment")];
-
-  const rise = (delay: number) => ({
-    initial: reduced ? false : { opacity: 0, y: 16 },
-    animate: { opacity: 1, y: 0 },
-    transition: {
-      duration: reduced ? 0 : DUR.enter,
-      delay: reduced ? 0 : delay,
-      ease: EASE,
-    },
-  });
+  const count = 2;
+  const go = (next: number) => setIndex(Math.max(0, Math.min(count - 1, next)));
 
   return (
     <section className="mx-auto w-full max-w-[1280px] px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8">
-      <div className="grid gap-2.5 sm:gap-3 lg:grid-cols-[1.62fr_1fr]">
+      <div className="relative overflow-hidden rounded-panel border border-line bg-white shadow-soft">
         <motion.div
-          {...rise(0)}
-          className="relative overflow-hidden rounded-2xl bg-well lg:min-h-[356px]"
+          drag={reduced ? false : "x"}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.14}
+          dragMomentum={false}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -60) go(index + 1);
+            else if (info.offset.x > 60) go(index - 1);
+          }}
+          animate={{ x: `-${index * 100}%` }}
+          transition={{ duration: reduced ? 0 : 0.45, ease: EASE }}
+          className="flex"
         >
-          <div className="relative z-10 flex flex-col justify-center px-5 py-8 sm:px-8 sm:py-9 md:h-full md:max-w-[57%] md:py-9 md:ps-8 md:pe-4 lg:py-10 lg:ps-10">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary rtl:tracking-normal">
-              {t("eyebrow")}
-            </p>
-
-            <h1 className="display-cut mt-3.5 text-[31px] leading-[1.06] text-obsidian sm:text-[38px] md:text-[34px] lg:text-[36px] xl:text-[40px] rtl:tracking-normal">
-              {t("title")} {t("accent")}
-            </h1>
-
-            <p className="mt-3 max-w-[330px] text-[13px] leading-relaxed text-obsidian/65 sm:text-sm">
-              {t("subtitle")}
-            </p>
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
-              <a
-                href="#selection"
-                className="group inline-flex h-11 items-center gap-2 rounded-pill bg-obsidian px-5 text-[13px] font-semibold text-white transition-colors hover:bg-obsidian/90 sm:text-sm"
-              >
-                {t("cta")}
-                <ArrowRight
-                  size={15}
-                  weight="bold"
-                  aria-hidden="true"
-                  className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-                />
-              </a>
-              <p className="flex items-center gap-1.5 text-xs text-obsidian/65">
-                <span
-                  aria-hidden="true"
-                  className="h-1.5 w-1.5 rounded-full bg-success"
-                />
-                {t("stock")}
+          {/* Slide 1 — brand promise on ink. */}
+          <div className="relative w-full shrink-0 bg-ink text-white">
+            <div className="relative z-10 flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9 md:min-h-[380px] md:max-w-[58%] md:py-10 lg:ps-10">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60 rtl:tracking-normal">
+                {t("eyebrow")}
               </p>
-            </div>
-
-            <ul className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-obsidian/65">
-              {trust.map((label, i) => {
-                const Icon = TRUST_ICONS[i];
-                return (
-                  <li key={label} className="flex items-center gap-1">
-                    <Icon
-                      size={14}
-                      weight="regular"
-                      aria-hidden="true"
-                      className="shrink-0 text-obsidian/40"
-                    />
-                    {label}
+              <h1 className="display-cut mt-3 text-[30px] leading-[1.05] sm:text-[40px] lg:text-[44px] rtl:tracking-normal">
+                {t("title")} <span className="text-blue-soft">{t("accent")}</span>
+              </h1>
+              <p className="mt-3 max-w-[36ch] text-[13px] leading-relaxed text-white/70 sm:text-sm">
+                {t("subtitle")}
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <a
+                  href="#selection"
+                  className="group inline-flex h-11 items-center gap-2 rounded-control bg-blue px-5 text-[13px] font-semibold text-white transition-colors hover:bg-blue-deep sm:text-sm"
+                >
+                  {t("cta")}
+                  <ArrowRight
+                    size={15}
+                    weight="bold"
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  />
+                </a>
+                <Link
+                  href={`/${locale}/products`}
+                  className="text-[13px] font-semibold text-white/70 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white"
+                >
+                  {t("browseAll")}
+                </Link>
+              </div>
+              <ul className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-white/60">
+                {TRUST.map(({ Icon, key }) => (
+                  <li key={key} className="flex items-center gap-1.5">
+                    <Icon size={14} aria-hidden="true" className="shrink-0 text-white/45" />
+                    {t(`trust.${key}` as "trust.delivery")}
                   </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div className="relative h-48 w-full sm:h-64 md:absolute md:inset-y-0 md:end-0 md:h-full md:w-[43%]">
-            <Image
-              src={feature.image}
-              alt={tp(`items.${feature.id}.title` as "items.p2.title")}
-              fill
-              priority
-              sizes="(max-width: 767px) 100vw, 40vw"
-              className="object-cover mix-blend-multiply"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-well via-well/30 to-transparent md:block rtl:bg-gradient-to-l"
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          {...rise(0.1)}
-          className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-primary p-6 text-white sm:p-7 md:flex-row md:items-end md:gap-6 lg:flex-col lg:items-stretch lg:gap-0 lg:p-8"
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -end-16 -top-20 h-56 w-56 rounded-full border border-white/15"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-24 -start-10 h-48 w-48 rounded-full border border-white/10"
-          />
-
-          <div className="relative">
-            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/95 rtl:tracking-normal">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-white" />
-              {t("deal.label")}
-            </p>
-
-            {discount && (
-              <p className="display-cut mt-4 text-[52px] leading-none sm:text-[60px]">
-                <span dir="ltr">{discount}</span>
-              </p>
-            )}
-
-            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/95 rtl:tracking-normal">
-              {deal.brand}
-            </p>
-            <h2 className="mt-1 text-[17px] font-semibold leading-snug sm:text-lg">
-              {t("deal.title")}
-            </h2>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span dir="ltr" className="text-[22px] font-semibold">
-                {format.format(deal.price)}
-              </span>
-              {deal.oldPrice && (
-                <span dir="ltr" className="text-[13px] text-white/95 line-through">
-                  {format.format(deal.oldPrice)}
-                </span>
-              )}
+                ))}
+              </ul>
+            </div>
+            <div className="relative h-44 w-full sm:h-56 md:absolute md:inset-y-0 md:end-0 md:h-full md:w-[42%]">
+              <Image
+                src={feature.image}
+                alt={tp(`items.${feature.id}.title` as "items.p2.title")}
+                fill
+                priority
+                sizes="(max-width: 767px) 100vw, 40vw"
+                className="object-cover opacity-90"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent md:bg-gradient-to-r md:from-ink md:via-ink/30 md:to-transparent rtl:md:bg-gradient-to-l"
+              />
             </div>
           </div>
 
-          <a
-            href="#selection"
-            className="group relative mt-6 inline-flex h-10 w-fit items-center gap-2 rounded-full bg-white px-4 text-[13px] font-semibold text-obsidian transition-colors hover:bg-obsidian hover:text-white md:mt-0"
-          >
-            {t("deal.cta")}
-            <ArrowRight
-              size={14}
-              weight="bold"
-              aria-hidden="true"
-              className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
-            />
-          </a>
+          {/* Slide 2 — the featured deal on mist. */}
+          <div className="relative w-full shrink-0 bg-mist text-ink">
+            <div className="relative z-10 flex flex-col justify-center px-5 py-7 sm:px-8 sm:py-9 md:min-h-[380px] md:max-w-[58%] md:py-10 lg:ps-10">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sale rtl:tracking-normal">
+                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-sale" />
+                {t("deal.label")}
+              </p>
+              {discount !== null && (
+                <p className="display-cut mt-3 text-[52px] leading-none text-sale sm:text-[64px]">
+                  <span dir="ltr">−{discount}%</span>
+                </p>
+              )}
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted rtl:tracking-normal">
+                {deal.brand}
+              </p>
+              <h2 className="mt-1 max-w-[24ch] text-[17px] font-semibold leading-snug sm:text-lg">
+                {t("deal.title")}
+              </h2>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span dir="ltr" className="num text-[22px] font-semibold">
+                  {formatDA(deal.price, locale)}
+                </span>
+                {deal.oldPrice && (
+                  <span dir="ltr" className="num text-[13px] text-faint line-through">
+                    {formatDA(deal.oldPrice, locale)}
+                  </span>
+                )}
+              </div>
+              <div className="mt-5">
+                <Link
+                  href={`/${locale}/product/${deal.id}`}
+                  className="group inline-flex h-11 items-center gap-2 rounded-control bg-ink px-5 text-[13px] font-semibold text-white transition-colors hover:bg-ink-soft sm:text-sm"
+                >
+                  {t("deal.cta")}
+                  <ArrowRight
+                    size={15}
+                    weight="bold"
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
+                  />
+                </Link>
+              </div>
+            </div>
+            <div className="relative h-44 w-full sm:h-56 md:absolute md:inset-y-0 md:end-0 md:h-full md:w-[42%]">
+              <Image
+                src={deal.image}
+                alt={tp(`items.${deal.id}.title` as "items.p1.title")}
+                fill
+                sizes="(max-width: 767px) 100vw, 40vw"
+                className="object-cover mix-blend-multiply"
+              />
+            </div>
+          </div>
         </motion.div>
+
+        {/* Controls */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-2.5 z-10 flex justify-center">
+          <div className="pointer-events-auto">
+            <PaginationDots
+              total={count}
+              current={index}
+              onSelect={go}
+              tone={index === 0 ? "white" : "ink"}
+              labelFor={(i) => t("slideDot", { index: i + 1, total: count })}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => go(index - 1)}
+          disabled={index === 0}
+          aria-label={t("slidePrev")}
+          className={cn(
+            "absolute start-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-control backdrop-blur transition-colors disabled:opacity-0 sm:flex rtl:-scale-x-100",
+            index === 0 ? "bg-white/10 text-white hover:bg-white/20" : "bg-white text-ink shadow-soft hover:bg-mist",
+          )}
+        >
+          <CaretLeft size={16} weight="bold" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={() => go(index + 1)}
+          disabled={index === count - 1}
+          aria-label={t("slideNext")}
+          className={cn(
+            "absolute end-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-control backdrop-blur transition-colors disabled:opacity-0 sm:flex rtl:-scale-x-100",
+            index === 0 ? "bg-white/10 text-white hover:bg-white/20" : "bg-white text-ink shadow-soft hover:bg-mist",
+          )}
+        >
+          <CaretRight size={16} weight="bold" aria-hidden="true" />
+        </button>
       </div>
     </section>
   );

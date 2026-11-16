@@ -15,7 +15,7 @@ export type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 const VARIANT: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand text-white shadow-[0_10px_24px_-14px_rgba(47,107,255,0.8)] hover:bg-brand-deep active:bg-brand-deep",
+    "bg-blue text-white shadow-[0_10px_24px_-14px_rgba(46,98,245,0.8)] hover:bg-blue-deep active:bg-blue-deep",
   accent:
     "bg-mint text-white shadow-[0_10px_24px_-14px_rgba(18,183,106,0.8)] hover:bg-mint-deep active:bg-mint-deep",
   outline:
@@ -140,7 +140,7 @@ export function IconButton({
       className={cn(
         BASE,
         VARIANT[variant],
-        "rounded-full",
+        "rounded-control",
         box,
         "shrink-0 p-0",
         className,

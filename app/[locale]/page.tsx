@@ -1,4 +1,3 @@
-import CategoryBrowse from "@/components/home/CategoryBrowse";
 import ServiceStrip from "@/components/home/ServiceStrip";
 import HeroBanner from "@/components/hero/HeroBanner";
 import ProductsSection from "@/components/products/ProductsSection";
@@ -15,9 +14,8 @@ export default async function HomePage({
   return (
     <>
       <HeroBanner />
-      <CategoryBrowse />
-      <ProductsSection limit={8} />
       <ServiceStrip />
+      <ProductsSection />
     </>
   );
 }

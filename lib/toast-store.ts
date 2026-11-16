@@ -1,4 +1,4 @@
-import { createStore, useStore } from "./store";
+import { create } from "zustand";
 
 export type Toast = {
   id: number;
@@ -8,10 +8,11 @@ export type Toast = {
   actionLabel?: string;
 };
 
-type ToastState = { toasts: Toast[] };
-
-const EMPTY: ToastState = { toasts: [] };
-const store = createStore<ToastState>(EMPTY);
+type ToastState = {
+  toasts: Toast[];
+  push: (toast: Omit<Toast, "id">, ttl?: number) => number;
+  dismiss: (id: number) => void;
+};
 
 let seq = 0;
 const timers = new Map<number, ReturnType<typeof setTimeout>>();
@@ -22,27 +23,32 @@ const clear = (id: number) => {
   timers.delete(id);
 };
 
-export const toastStore = {
-  get: () => store.get(),
+export const useToastStore = create<ToastState>((set, get) => ({
+  toasts: [],
 
-  push(toast: Omit<Toast, "id">, ttl = 5000) {
+  push(toast, ttl = 5000) {
     const id = ++seq;
-    const next = [...store.get().toasts, { ...toast, id }].slice(-3);
-    store.set({ toasts: next });
+    set({ toasts: [...get().toasts, { ...toast, id }].slice(-3) });
     clear(id);
     timers.set(
       id,
-      setTimeout(() => toastStore.dismiss(id), ttl),
+      setTimeout(() => get().dismiss(id), ttl),
     );
     return id;
   },
 
-  dismiss(id: number) {
+  dismiss(id) {
     clear(id);
-    store.set({ toasts: store.get().toasts.filter((t) => t.id !== id) });
+    set({ toasts: get().toasts.filter((t) => t.id !== id) });
   },
+}));
+
+export const toastStore = {
+  get: useToastStore.getState,
+  push: (toast: Omit<Toast, "id">, ttl?: number) => useToastStore.getState().push(toast, ttl),
+  dismiss: (id: number) => useToastStore.getState().dismiss(id),
 };
 
 export function useToasts(): Toast[] {
-  return useStore(store).toasts;
+  return useToastStore((s) => s.toasts);
 }

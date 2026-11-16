@@ -32,13 +32,10 @@ const SOCIALS = [
   },
 ];
 
-const linkClass =
-  "inline-block py-2.5 text-sm text-slate-400 transition-colors hover:text-white";
-const headingClass =
-  "text-xs font-semibold uppercase tracking-[0.14em] text-white rtl:tracking-normal";
-
-const PAYMENTS = ["Visa", "Mastercard", "PayPal", "Apple Pay"];
-
+/**
+ * Light, three-zone footer: brand statement + newsletter, sitemap columns
+ * (zero-JS accordion on phones), legal bar, and a dissolving wordmark.
+ */
 export default async function Footer() {
   const t = await getTranslations("footer");
   const locale = await getLocale();
@@ -47,19 +44,19 @@ export default async function Footer() {
     {
       title: t("shop"),
       links: [
-        { href: `/${locale}#selection`, label: t("shopLinks.all") },
-        { href: `/${locale}#selection`, label: t("shopLinks.new") },
-        { href: `/${locale}#selection`, label: t("shopLinks.best") },
-        { href: `/${locale}#selection`, label: t("shopLinks.gift") },
+        { href: `/${locale}/products`, label: t("shopLinks.all") },
+        { href: `/${locale}/products?cat=cameras`, label: t("shopLinks.new") },
+        { href: `/${locale}/products`, label: t("shopLinks.best") },
+        { href: `/${locale}/favorites`, label: t("shopLinks.gift") },
       ],
     },
     {
       title: t("help"),
       links: [
-        { href: `/${locale}`, label: t("helpLinks.shipping") },
-        { href: `/${locale}`, label: t("helpLinks.returns") },
-        { href: `/${locale}`, label: t("helpLinks.faq") },
-        { href: `/${locale}`, label: t("helpLinks.contact") },
+        { href: `/${locale}/products`, label: t("helpLinks.shipping") },
+        { href: `/${locale}/profile`, label: t("helpLinks.returns") },
+        { href: `/${locale}/products`, label: t("helpLinks.faq") },
+        { href: `/${locale}/profile`, label: t("helpLinks.contact") },
       ],
     },
     {
@@ -83,78 +80,144 @@ export default async function Footer() {
   ];
 
   return (
-    <footer className="mt-0 bg-obsidian text-white">
-      <div className="mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-8 border-b border-white/10 py-12 lg:grid-cols-[1fr_460px] lg:items-center lg:gap-16 lg:py-16">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary rtl:tracking-normal">
-              {t("news")}
-            </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+    <footer
+      className="relative isolate overflow-hidden bg-white"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      {/* Fade-in top divider, brighter at centre. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(11,13,16,0.12) 25%, rgba(11,13,16,0.12) 75%, transparent 100%)",
+        }}
+      />
+      {/* Ambient blue wash, invisible until noticed. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-60"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 0%, rgba(46,98,245,0.05) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto w-full max-w-[1280px] px-4 pt-14 sm:px-6 sm:pt-16 lg:px-8 lg:pt-20">
+        {/* Brand statement + newsletter */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_460px] lg:items-end lg:gap-16">
+          <div className="max-w-xl">
+            <Logo href={`/${locale}`} />
+            <h2 className="display-cut mt-6 text-[26px] leading-[1.15] text-ink sm:text-[30px]">
               {t("newsTitle")}
             </h2>
-            <p className="mt-2.5 max-w-md text-sm leading-relaxed text-slate-400">
+            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-muted">
               {t("newsText")}
             </p>
           </div>
-          <FooterNewsletter />
-        </div>
-
-        <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8 lg:py-16">
-          <div className="sm:col-span-2 lg:col-span-4">
-            <Logo href={`/${locale}`} tone="dark" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
-              {t("tagline")}
+          <div className="rounded-panel border border-line bg-mist p-4 sm:p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-blue-deep rtl:tracking-normal">
+              {t("news")}
             </p>
-            <div className="mt-6 flex items-center gap-2">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.name}
-                  href={`/${locale}`}
-                  aria-label={social.name}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-slate-400 transition-colors hover:border-white/25 hover:bg-white/5 hover:text-white"
-                >
-                  {social.icon}
-                </a>
-              ))}
+            <div className="mt-3">
+              <FooterNewsletter />
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:col-span-2 lg:col-span-8 lg:grid-cols-4 lg:gap-8">
-            {columns.map((column) => (
-              <nav key={column.title} aria-label={column.title}>
-                <h3 className={headingClass}>{column.title}</h3>
-                <ul className="mt-4">
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <Link href={link.href} className={linkClass}>
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+        <div className="mt-12 h-px w-full bg-ink/[0.06] sm:mt-14" />
+
+        {/* Sitemap: accordion on phones, grid from sm up. */}
+        <div className="mt-8 grid grid-cols-1 gap-2 sm:mt-12 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 lg:grid-cols-4">
+          {columns.map((column) => (
+            <details
+              key={column.title}
+              className="group border-b border-ink/[0.06] py-1 open:pb-3 sm:border-none sm:py-0 sm:open:pb-0"
+            >
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-1.5 rounded-control px-2 py-2 text-[13px] font-semibold text-ink transition-colors hover:bg-mist sm:pointer-events-none sm:px-0 sm:hover:bg-transparent [&::-webkit-details-marker]:hidden">
+                <span>{column.title}</span>
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  aria-hidden="true"
+                  className="h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 group-open:rotate-180 sm:hidden"
+                >
+                  <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </summary>
+              <ul className="mt-2 flex flex-col gap-0.5 sm:mt-4">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="group/link flex min-h-[40px] items-center justify-between gap-3 rounded-control px-2 py-2 text-[13.5px] font-medium text-muted transition-colors hover:bg-mist hover:text-ink"
+                    >
+                      <span className="truncate">{link.label}</span>
+                      <svg
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        aria-hidden="true"
+                        className="h-3.5 w-3.5 shrink-0 -translate-x-0.5 text-faint opacity-60 transition-all duration-150 group-hover/link:translate-x-0 group-hover/link:text-blue group-hover/link:opacity-100 rtl:-scale-x-100"
+                      >
+                        <path d="M6 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+        {/* Force the accordion open from sm up without JS. */}
+        <style>{`
+          @media (min-width: 640px) {
+            footer details > ul { display: block; }
+          }
+        `}</style>
+
+        {/* Legal bar */}
+        <div className="mt-12 flex flex-col gap-4 border-t border-ink/[0.06] pt-6 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] sm:flex-row sm:items-center sm:justify-between lg:pb-8">
+          <p className="text-[12px] text-faint">© 2026 Hanutek. {t("rights")}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-control border border-line bg-mist px-2.5 py-1 text-[11px] font-semibold text-muted">
+              {t("codBadge")}
+            </span>
+            {SOCIALS.map((social) => (
+              <a
+                key={social.name}
+                href={`/${locale}`}
+                aria-label={social.name}
+                className="flex h-9 w-9 items-center justify-center rounded-control border border-line text-muted transition-colors hover:border-ink/25 hover:bg-mist hover:text-ink"
+              >
+                {social.icon}
+              </a>
             ))}
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-white/10 pt-6 pb-[calc(env(safe-area-inset-bottom)+7rem)] sm:flex-row sm:items-center sm:justify-between lg:pb-6">
-          <p className="text-xs text-slate-400">
-            © 2026 Hanutek. {t("rights")}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="me-1 text-[11px] uppercase tracking-[0.12em] text-slate-400 rtl:tracking-normal">
-              {t("payments")}
-            </span>
-            {PAYMENTS.map((payment) => (
-              <span
-                key={payment}
-                className="rounded-md border border-white/10 px-2 py-1 text-[10px] font-medium text-slate-400"
-              >
-                {payment}
-              </span>
-            ))}
-          </div>
+        {/* Dissolving wordmark */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none relative select-none overflow-hidden"
+          style={{ height: "clamp(56px, 12vw, 160px)" }}
+        >
+          <span
+            className="absolute inset-x-0 top-0 block whitespace-nowrap bg-clip-text text-center text-transparent"
+            style={{
+              fontSize: "clamp(72px, 18vw, 240px)",
+              lineHeight: 0.9,
+              fontWeight: 800,
+              letterSpacing: "-0.06em",
+              backgroundImage:
+                "linear-gradient(180deg, rgba(11,13,16,0.06) 0%, rgba(11,13,16,0.02) 55%, rgba(11,13,16,0) 100%)",
+            }}
+          >
+            HANUTEK
+          </span>
         </div>
       </div>
     </footer>

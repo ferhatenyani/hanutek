@@ -1,92 +1,100 @@
-import {
-  colorwaysOf,
-  defaultColorway,
-  productById,
-  totalsFor,
-  type ColorwayKey,
-  type Product,
-  type Totals,
-} from "./products";
-import { createStore, useStore } from "./store";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { productById, totalsFor, type Product, type Totals } from "./products";
 
 export type CartLine = {
-  /** Product id + colourway, so the same SKU in two colours stays two lines. */
+  /** Product id — one line per SKU. */
   key: string;
   id: string;
   qty: number;
-  colorway: ColorwayKey;
 };
 
 export type ResolvedLine = CartLine & { product: Product; lineTotal: number };
 
-type CartState = { lines: CartLine[] };
+type CartState = {
+  lines: CartLine[];
+  /** Persisted: the first-ever add gets the page-blur spotlight. */
+  hasAdded: boolean;
+  /** Transient: bumped on every add so the header icon can react. */
+  pulse: number;
+  spotlight: boolean;
+  add: (id: string, qty?: number) => void;
+  setQty: (key: string, qty: number) => void;
+  remove: (key: string) => void;
+  clear: () => void;
+  endSpotlight: () => void;
+};
 
-const EMPTY: CartState = { lines: [] };
 const MAX_QTY = 9;
-
-const store = createStore<CartState>(EMPTY, { persist: "cart" });
-
-const lineKey = (id: string, colorway: ColorwayKey) => `${id}:${colorway}`;
-
 const clampQty = (qty: number) =>
   Math.max(1, Math.min(MAX_QTY, Math.round(qty) || 1));
 
-/** Drops ids that no longer exist in the catalogue (stale localStorage). */
-const sanitize = (state: CartState): CartState => {
-  const lines = state.lines.filter((l) => {
-    const product = productById(l.id);
-    return !!product && colorwaysOf(product).includes(l.colorway);
-  });
-  return lines.length === state.lines.length ? state : { lines };
-};
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      lines: [],
+      hasAdded: false,
+      pulse: 0,
+      spotlight: false,
 
-// Normalising once at module load keeps `getSnapshot` referentially stable,
-// which useSyncExternalStore requires to avoid render loops.
-store.set(sanitize(store.get()));
+      add(id, qty = 1) {
+        const product = productById(id);
+        if (!product || !product.inStock) return;
+        const { lines, hasAdded } = get();
+        const existing = lines.find((l) => l.key === id);
+        const next = existing
+          ? lines.map((l) => (l.key === id ? { ...l, qty: clampQty(l.qty + qty) } : l))
+          : [...lines, { key: id, id, qty: clampQty(qty) }];
+        set({
+          lines: next,
+          hasAdded: true,
+          pulse: get().pulse + 1,
+          spotlight: !hasAdded,
+        });
+      },
 
-const current = () => store.get();
+      setQty(key, qty) {
+        if (qty <= 0) return get().remove(key);
+        set({
+          lines: get().lines.map((l) => (l.key === key ? { ...l, qty: clampQty(qty) } : l)),
+        });
+      },
 
+      remove(key) {
+        set({ lines: get().lines.filter((l) => l.key !== key) });
+      },
+
+      clear() {
+        set({ lines: [] });
+      },
+
+      endSpotlight() {
+        set({ spotlight: false });
+      },
+    }),
+    {
+      name: "hanutek:v2:cart",
+      storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
+      partialize: (s) => ({ lines: s.lines, hasAdded: s.hasAdded }),
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<CartState>;
+        const lines = (p.lines ?? []).filter((l) => !!productById(l.id));
+        return { ...current, lines, hasAdded: !!p.hasAdded };
+      },
+    },
+  ),
+);
+
+/** Stable imperative facade for non-React callers. */
 export const cartStore = {
-  subscribe: store.subscribe,
-  getServer: store.getServer,
-  get: current,
-
-  add(id: string, qty = 1, colorway?: ColorwayKey) {
-    const product = productById(id);
-    if (!product || !product.inStock) return;
-    const variant =
-      colorway && colorwaysOf(product).includes(colorway)
-        ? colorway
-        : defaultColorway(product);
-    const key = lineKey(id, variant);
-    const { lines } = current();
-    const existing = lines.find((l) => l.key === key);
-    const next = existing
-      ? lines.map((l) =>
-          l.key === key ? { ...l, qty: clampQty(l.qty + qty) } : l,
-        )
-      : [...lines, { key, id, qty: clampQty(qty), colorway: variant }];
-    store.set({ lines: next });
-  },
-
-  setQty(key: string, qty: number) {
-    const { lines } = current();
-    if (qty <= 0) return cartStore.remove(key);
-    store.set({
-      lines: lines.map((l) => (l.key === key ? { ...l, qty: clampQty(qty) } : l)),
-    });
-  },
-
-  remove(key: string) {
-    store.set({ lines: current().lines.filter((l) => l.key !== key) });
-  },
-
-  clear() {
-    store.set(EMPTY);
-  },
-
-  /** Used when an order is placed: keeps the colourway history on the order. */
-  snapshot: current,
+  get: useCartStore.getState,
+  subscribe: useCartStore.subscribe,
+  add: (id: string, qty?: number) => useCartStore.getState().add(id, qty),
+  setQty: (key: string, qty: number) => useCartStore.getState().setQty(key, qty),
+  remove: (key: string) => useCartStore.getState().remove(key),
+  clear: () => useCartStore.getState().clear(),
+  snapshot: () => ({ lines: useCartStore.getState().lines }),
 };
 
 export const resolveLines = (lines: CartLine[]): ResolvedLine[] =>
@@ -96,24 +104,21 @@ export const resolveLines = (lines: CartLine[]): ResolvedLine[] =>
     return [{ ...line, product, lineTotal: product.price * line.qty }];
   });
 
-export const cartTotals = (
-  state: CartState,
-  shippingMethod: Parameters<typeof totalsFor>[1] = "standard",
-  promoCode?: string | null,
-): Totals => totalsFor(resolveLines(state.lines), shippingMethod, promoCode);
+export const cartTotals = (state: { lines: CartLine[] }): Totals =>
+  totalsFor(resolveLines(state.lines));
 
-export function useCart(): CartState {
-  return useStore(store);
+export function useCart() {
+  return useCartStore();
 }
 
 export function useCartLines(): ResolvedLine[] {
-  return resolveLines(useCart().lines);
+  return resolveLines(useCartStore((s) => s.lines));
 }
 
 export function useCartCount(): number {
-  return useCart().lines.reduce((sum, l) => sum + l.qty, 0);
+  return useCartStore((s) => s.lines.reduce((sum, l) => sum + l.qty, 0));
 }
 
 export function useInCart(id: string): boolean {
-  return useCart().lines.some((l) => l.id === id);
+  return useCartStore((s) => s.lines.some((l) => l.id === id));
 }

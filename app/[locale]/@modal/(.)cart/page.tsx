@@ -1,5 +1,3 @@
-import CartSheet from "@/components/cart/CartSheet";
-
-export default function CartModalPage() {
-  return <CartSheet />;
+export default function CartIntercept() {
+  return null;
 }

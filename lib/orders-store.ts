@@ -1,13 +1,11 @@
-import type { ColorwayKey } from "./products";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type { Totals } from "./products";
-import { createStore, useStore } from "./store";
-import type { Address } from "./session-store";
 
 export type OrderLine = {
   id: string;
   image: string;
   qty: number;
-  colorway: ColorwayKey;
   unitPrice: number;
 };
 
@@ -17,28 +15,33 @@ export type Order = {
   ref: string;
   placedAt: string;
   status: OrderStatus;
-  email: string;
+  name: string;
+  phone: string;
+  address: string;
   lines: OrderLine[];
   totals: Totals;
-  shippingMethod: string;
-  address: Address;
-  card: { brand: string; last4: string };
+  payment: "cod";
 };
 
-type OrdersState = { orders: Order[] };
+type OrdersState = {
+  orders: Order[];
+  place: (order: Order) => void;
+};
 
-const EMPTY: OrdersState = { orders: [] };
-const store = createStore<OrdersState>(EMPTY, { persist: "orders" });
-
-const BRANDS: { pattern: RegExp; brand: string }[] = [
-  { pattern: /^4/, brand: "Visa" },
-  { pattern: /^5/, brand: "Mastercard" },
-  { pattern: /^3[47]/, brand: "American Express" },
-];
-
-export const cardBrandOf = (digits: string) =>
-  BRANDS.find((entry) => entry.pattern.test(digits.replace(/\s/g, "")))?.brand ??
-  "Carte";
+export const useOrdersStore = create<OrdersState>()(
+  persist(
+    (set, get) => ({
+      orders: [],
+      place: (order) => set({ orders: [order, ...get().orders] }),
+    }),
+    {
+      name: "hanutek:v2:orders",
+      storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
+      partialize: (s) => ({ orders: s.orders }),
+    },
+  ),
+);
 
 /** Deterministic, readable reference: HT-<yy><MM><dd>-<3 digits>. */
 export const orderRef = (date = new Date()) => {
@@ -51,22 +54,16 @@ export const orderRef = (date = new Date()) => {
 };
 
 export const ordersStore = {
-  get: () => store.get(),
-  subscribe: store.subscribe,
-
-  place(order: Order) {
-    store.set({ orders: [order, ...store.get().orders] });
-  },
-
-  find(ref: string) {
-    return store.get().orders.find((o) => o.ref === ref);
-  },
+  get: useOrdersStore.getState,
+  subscribe: useOrdersStore.subscribe,
+  place: (order: Order) => useOrdersStore.getState().place(order),
+  find: (ref: string) => useOrdersStore.getState().orders.find((o) => o.ref === ref),
 };
 
 export function useOrders(): Order[] {
-  return useStore(store).orders;
+  return useOrdersStore((s) => s.orders);
 }
 
 export function useOrder(ref: string): Order | undefined {
-  return useOrders().find((o) => o.ref === ref);
+  return useOrdersStore((s) => s.orders.find((o) => o.ref === ref));
 }

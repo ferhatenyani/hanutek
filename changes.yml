@@ -1,0 +1,79 @@
+let's make some changes: 
+
+- since it is destined for the algerian market i only want dzd currency everywhere
+- i want styled scroll bars everywhere (color)
+- i want a simpler and better footer like this one: C:\Users\MyHomehP\Desktop\work\JobMarket + a better styled newsletter section in the same asthetic
+- i want a shared level of roundness everywhere across the whole app (use the ratio of the current homepage 3 buttons for filtering: price, note, filter)
+- i want a unified color palette (with white as a bg, shades of black and maybe blue for ctas, your call) 
+- i want you to suggest an enhanced and more polished design direction for the whole webapp (besides the current cards design) and then apply it across all the pages
+- remove /cart page completely 
+- remove product details modal
+
+home page: 
+- remove category section (parcourir par categorie)
+- remove the filtering section + add a see more button with an arrow icon on top of the section + make different sections, paginated and with dots, exactly like in this project (only make two sections for now, seperate the current products however you want):C:\Users\MyHomehP\Desktop\work\old\EL\el-user-app
+- i want the cards to be a little more rounded (exactly the level of roundness of the current 3 filtering buttons on top of the section : price, note, filter) + addapt the content of the cards to the current products, i dont want the stars/user notes, i want smaller product names with a gray description bellow the header of the card with a see complete description tooltip
+- you can move the navbar items further more to the edge of the screen and position therefore the searchbar more on the left and make it a little bigger + add a real suggestions tooling like in this project: C:\Users\MyHomehP\Desktop\work\old\EL\el-user-app
+- the current navbar is not responsive through custom breakpoints between the common one, icons break and layout too especially for the searchbar + cart button
+- the current hero section is not responsive nor mobile first at all, see this screen: /public/mobile.webp
+- bottom deck nav is too large on tablets, make it more responsive
+
+all products page: 
+- i want a better design direction for the hero section (i want your suggestions after invoking your /ui-ux-pro-max skill first)
+- use exact same cards as home page (after making the changes i specified in homepage changes)
+- scrolling should be better wired, scrolling when mouse is on top of filtering area should only enable scroll for the filtering section, same goes for the products area
+- filtering section does not look good on mobile (sliding bottom sheet), nor does the filter button and the others 
+
+
+login page: 
+i want you to simply and polish the design direction + mobile design of the login/signup page + add a google authentication button
+
+profile page: 
+- polish the design across all breakpoints
+
+favorites page: 
+- use cards of homepage (after applying specified changes)
+
+cart page: 
+- simplify and polish its design direction for a more professional look
+- when clicking the cart page: 
+- a bottom sheet slides up to take up almost all the available space vertically with some top margin and curver top two edges + blurr on the content behind it (merrely visible behind the top margin), make it simple and minimalistic with the items, total, big go to checkout CTA. 
+
+
+
+
+userflows: 
+
+- add to cart:
+ - just an animation, thats all + an auto hover on the cart icon + blurr the rest of the page when its the first time the user adds to the cart, if its not the first time then just a little animation on the cart icon
+
+- checkout:
+ - clicking the checkout bottom slides the content of the already slided bottom sheet with a simple and minimalist form with : name, number, full adress, total to pay + cash on delivery only tag at the bottom + big CTA to finalize the order
+
+- clicking a product:
+ - slides up a bottom sheet in the exact same style as the cart one, polished professional and minimalist with direct add to cart or checkout CTAs, and if the user clicks either of the two then the described two user flows above get directly triggered but this time the whole content of the cart oage (with checkout) gets slided up in the same bottom sheet that is already enable but this time the user can directly confirm his order without reclicking on go to checkout process unlike the cart bottom sheet page
+
+- check for current console errors when navigating through the app like:
+
+[browser] Image with src "/assets/products/p9.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+[browser] Image with src "/assets/products/p12.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+[browser] Image with src "/assets/products/p10.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+[browser] Image with src "/assets/products/p11.jpg" has "fill" and parent element with invalid "position". Provided "static" should be one of absolute,fixed,relative.
+Error: Route "/[locale]/products": Next.js encountered URL data during prerendering or a navigation.
+
+`params` or `searchParams` accessed outside of `<Suspense>` may prevent the navigation from being instant, leading to a slower user experience.
+
+Ways to fix this:
+  - [stream] Provide a placeholder with `<Suspense fallback={...}>` around the data access
+  - [block] Set `export const instant = false` to allow a blocking route
+
+Learn more: https://nextjs.org/docs/messages/instant-shell-url-data
+    at ProductsRoute (app\[locale]\products\page.tsx:17:19)
+  15 |   const { locale } = await params;
+  16 |   setRequestLocale(locale);
+> 17 |   const { cat } = await searchParams;
+     |                   ^
+  18 |   const initial = (categories as readonly string[]).includes(cat ?? "")
+  19 |     ? (cat as ProductCategory)
+  20 |     : "all";
+

@@ -143,7 +143,7 @@ test.describe("no browser defaults survive", () => {
       const node = document.querySelector("section.bg-canvas, .bg-canvas");
       return node ? getComputedStyle(node).backgroundColor : null;
     });
-    expect(section).toBe("rgb(248, 250, 252)");
+    expect(section).toBe("rgb(247, 248, 250)");
   });
 });
 

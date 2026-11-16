@@ -1,28 +1,23 @@
-import { useSyncExternalStore } from "react";
+import { create } from "zustand";
 
-type Listener = () => void;
+type SearchState = {
+  query: string;
+  setQuery: (next: string) => void;
+  clear: () => void;
+};
 
-let query = "";
-const listeners = new Set<Listener>();
+export const useSearchStore = create<SearchState>((set) => ({
+  query: "",
+  setQuery: (query) => set({ query }),
+  clear: () => set({ query: "" }),
+}));
 
 export const searchStore = {
-  subscribe(listener: Listener) {
-    listeners.add(listener);
-    return () => listeners.delete(listener);
-  },
-  getQuery: () => query,
-  setQuery: (next: string) => {
-    if (next === query) return;
-    query = next;
-    listeners.forEach((listener) => listener());
-  },
-  clear: () => searchStore.setQuery(""),
+  getQuery: () => useSearchStore.getState().query,
+  setQuery: (next: string) => useSearchStore.getState().setQuery(next),
+  clear: () => useSearchStore.getState().clear(),
 };
 
 export function useSearchQuery() {
-  return useSyncExternalStore(
-    searchStore.subscribe,
-    searchStore.getQuery,
-    () => "",
-  );
+  return useSearchStore((s) => s.query);
 }

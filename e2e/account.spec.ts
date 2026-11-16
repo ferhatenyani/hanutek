@@ -50,7 +50,15 @@ test.describe("mock sign-in", () => {
     await expect(page).toHaveURL(/\/fr\/profile$/, { timeout: 10_000 });
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Bonjour Imane Bennani");
     await expect(page.getByText("imane.bennani@example.fr")).toBeVisible();
-    await expect(page.getByText("14 rue des Ateliers")).toBeVisible();
+    await expect(page.getByText("Client depuis")).toBeVisible();
+    watcher.expectClean();
+  });
+
+  test("the Google button signs into the same local session", async ({ page }) => {
+    const watcher = watchErrors(page);
+    await page.getByTestId("google-login").click();
+    await expect(page).toHaveURL(/\/fr\/profile$/, { timeout: 10_000 });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Bonjour Imane Bennani");
     watcher.expectClean();
   });
 
@@ -76,15 +84,13 @@ test.describe("mock sign-in", () => {
     await expect(page).toHaveURL(/\/fr\/login\?next=\/profile$/, { timeout: 10_000 });
   });
 
-  test("checkout sends an unauthenticated shopper to login and back", async ({ page }) => {
+  test("checkout never requires an account", async ({ page }) => {
     await gotoClean(page, FR);
     await addCard(page, 0);
     await dockGoto(page, /Panier/);
-    await page.getByRole("link", { name: "Passer la commande" }).click();
-    await expect(page.getByText("Un compte Hanutek enregistre vos adresses")).toBeVisible();
-
-    await page.getByRole("link", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL(/\/fr\/login\?next=\/checkout$/);
+    await page.getByRole("button", { name: /Passer à la caisse/ }).click();
+    await expect(page).toHaveURL(/\/fr\/checkout$/);
+    await expect(page.getByLabel("Nom complet")).toBeVisible();
   });
 });
 
@@ -122,7 +128,7 @@ test.describe("favourites", () => {
 });
 
 test.describe("order history", () => {
-  test("a paid order appears in the account", async ({ page }) => {
+  test("a confirmed order appears in the account", async ({ page }) => {
     await gotoClean(page, `${FR}/login`);
     await page.getByLabel("E-mail", { exact: true }).fill("thomas.ferrand@example.fr");
     await page.getByLabel("Mot de passe", { exact: true }).fill("motdepasse");
@@ -130,30 +136,21 @@ test.describe("order history", () => {
     await expect(page.getByText("Aucune commande pour l'instant")).toBeVisible();
 
     await dockGoto(page, /^Accueil/);
-    await expect(page.getByTestId("product-card").nth(4)).toBeVisible();
     await addCard(page, 4);
     await dockGoto(page, /Panier/);
-    await page.getByRole("link", { name: "Passer la commande" }).click();
+    await page.getByRole("button", { name: /Passer à la caisse/ }).click();
 
-    // The signed-in account prefills the contact step, but the shopper still
-    // has to advance to livraison before those fields are on screen.
-    await page.getByRole("button", { name: "Continuer vers la livraison" }).click();
-    await page.getByLabel("Adresse", { exact: true }).fill("8 quai des Chartrons");
-    await page.getByLabel("Code postal", { exact: true }).fill("33000");
-    await page.getByLabel("Ville", { exact: true }).fill("Bordeaux");
-    await page.getByRole("button", { name: "Continuer vers le paiement" }).click();
-    await page.getByLabel("Titulaire de la carte").fill("Thomas Ferrand");
-    await page.getByLabel("Numéro de carte").type("5555555555554444");
-    await page.getByLabel("Expiration").type("0431");
-    await page.getByLabel("Cryptogramme").fill("321");
-    await page.getByRole("checkbox").check();
-    await page.getByRole("button", { name: /Payer/ }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Nom complet").fill("Thomas Ferrand");
+    await dialog.getByLabel("Numéro de téléphone").fill("0560123456");
+    await dialog.getByLabel("Adresse complète").fill("Oran, Es Sénia, cité 200 logts");
+    await dialog.getByRole("button", { name: /Confirmer la commande/ }).click();
     await expect(page).toHaveURL(/\/fr\/order\//, { timeout: 15_000 });
 
-    await expect(page.getByText("Mastercard ·•••• 4444")).toBeVisible();
-    await expect(page.getByText("8 quai des Chartrons")).toBeVisible();
+    await expect(page.getByText("Oran, Es Sénia, cité 200 logts")).toBeVisible();
 
-    await dockGoto(page, /Compte/);
+    await dialog.getByRole("link", { name: "Suivre ma commande" }).click();
+    await expect(page).toHaveURL(/\/fr\/profile$/, { timeout: 10_000 });
     await expect(page.getByText("1 commande")).toBeVisible();
     await expect(page.getByRole("link", { name: /HT-\d{6}-\d{3}/ })).toBeVisible();
   });
@@ -171,7 +168,7 @@ test.describe("arabic storefront", () => {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.getByTestId("cart-line")).toHaveCount(1);
-    await expect(dialog.getByRole("button", { name: /إتمام الطلب/ })).toHaveCount(0);
+    await expect(dialog.getByRole("button", { name: /الانتقال إلى الدفع/ })).toHaveCount(1);
 
     await page.getByTestId("sheet-panel").getByRole("button", { name: "إغلاق" }).click();
     await expect(page.getByTestId("sheet-panel")).toHaveCount(0);
@@ -183,7 +180,7 @@ test.describe("arabic storefront", () => {
     await page.getByTestId("product-card").nth(1).getByRole("link").first().click();
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText("أسود فحمي")).toBeVisible();
-    await expect(dialog.getByTestId("buy-bar").getByRole("button", { name: "أضف إلى السلة" })).toBeEnabled();
+    await expect(dialog.getByText("Vistar").first()).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "أضف", exact: true })).toBeEnabled();
   });
 });

@@ -30,14 +30,23 @@ export default defineConfig({
       name: "mobile",
       // Pixel 7 keeps the suite on Chromium, the only browser downloaded here.
       use: { ...devices["Pixel 7"], viewport: { width: 393, height: 851 } },
+      testIgnore: /breakpoints\.spec\.ts/,
     },
     {
       name: "small-phone",
       use: { ...devices["Desktop Chrome"], viewport: { width: 360, height: 640 } },
+      testIgnore: /breakpoints\.spec\.ts/,
     },
     {
       name: "desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+      testIgnore: /breakpoints\.spec\.ts/,
+    },
+    {
+      // The custom-breakpoint matrix sets its own viewport per test.
+      name: "breakpoints",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: /breakpoints\.spec\.ts/,
     },
   ],
 

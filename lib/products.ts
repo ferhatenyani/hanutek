@@ -11,6 +11,7 @@ export type Product = {
   id: string;
   image: string;
   brand: string;
+  /** Whole Algerian dinars. */
   price: number;
   oldPrice?: number;
   badge?: "best" | "new" | "promo";
@@ -20,18 +21,18 @@ export type Product = {
 
 // ids are 1:1 with public/assets/products/<id>.jpg (see scripts/fetch-products.mjs)
 export const products: Product[] = [
-  { id: "p1", image: "/assets/products/p1.jpg", brand: "Vistar", price: 89, oldPrice: 119, badge: "promo", category: "cameras", inStock: true },
-  { id: "p2", image: "/assets/products/p2.jpg", brand: "Vistar", price: 79, badge: "best", category: "cameras", inStock: true },
-  { id: "p3", image: "/assets/products/p3.jpg", brand: "Norddrive", price: 25, badge: "new", category: "mounts", inStock: true },
-  { id: "p4", image: "/assets/products/p4.jpg", brand: "Terraline", price: 45, badge: "best", category: "storage", inStock: true },
-  { id: "p5", image: "/assets/products/p5.jpg", brand: "Terraline", price: 32, category: "storage", inStock: true },
-  { id: "p6", image: "/assets/products/p6.jpg", brand: "Aeroform", price: 59, oldPrice: 74, badge: "promo", category: "cleaning", inStock: true },
-  { id: "p7", image: "/assets/products/p7.jpg", brand: "Aeroform", price: 39, badge: "new", category: "cleaning", inStock: true },
-  { id: "p8", image: "/assets/products/p8.jpg", brand: "Lumo", price: 79, category: "lighting", inStock: false },
-  { id: "p9", image: "/assets/products/p9.jpg", brand: "Voltway", price: 129, badge: "best", category: "power", inStock: true },
-  { id: "p10", image: "/assets/products/p10.jpg", brand: "Voltway", price: 49, category: "power", inStock: true },
-  { id: "p11", image: "/assets/products/p11.jpg", brand: "Voltway", price: 65, oldPrice: 89, badge: "promo", category: "power", inStock: false },
-  { id: "p12", image: "/assets/products/p12.jpg", brand: "Gridline", price: 22, badge: "new", category: "interior", inStock: true },
+  { id: "p1", image: "/assets/products/p1.jpg", brand: "Vistar", price: 8900, oldPrice: 11900, badge: "promo", category: "cameras", inStock: true },
+  { id: "p2", image: "/assets/products/p2.jpg", brand: "Vistar", price: 7900, badge: "best", category: "cameras", inStock: true },
+  { id: "p3", image: "/assets/products/p3.jpg", brand: "Norddrive", price: 2500, badge: "new", category: "mounts", inStock: true },
+  { id: "p4", image: "/assets/products/p4.jpg", brand: "Terraline", price: 4500, badge: "best", category: "storage", inStock: true },
+  { id: "p5", image: "/assets/products/p5.jpg", brand: "Terraline", price: 3200, category: "storage", inStock: true },
+  { id: "p6", image: "/assets/products/p6.jpg", brand: "Aeroform", price: 5900, oldPrice: 7400, badge: "promo", category: "cleaning", inStock: true },
+  { id: "p7", image: "/assets/products/p7.jpg", brand: "Aeroform", price: 3900, badge: "new", category: "cleaning", inStock: true },
+  { id: "p8", image: "/assets/products/p8.jpg", brand: "Lumo", price: 7900, category: "lighting", inStock: false },
+  { id: "p9", image: "/assets/products/p9.jpg", brand: "Voltway", price: 12900, badge: "best", category: "power", inStock: true },
+  { id: "p10", image: "/assets/products/p10.jpg", brand: "Voltway", price: 4900, category: "power", inStock: true },
+  { id: "p11", image: "/assets/products/p11.jpg", brand: "Voltway", price: 6500, oldPrice: 8900, badge: "promo", category: "power", inStock: false },
+  { id: "p12", image: "/assets/products/p12.jpg", brand: "Gridline", price: 2200, badge: "new", category: "interior", inStock: true },
 ];
 
 export const categories: ProductCategory[] = [
@@ -46,28 +47,16 @@ export const categories: ProductCategory[] = [
 
 export const productById = (id: string) => products.find((p) => p.id === id);
 
-// Price-band facet. Bounds follow the catalog's actual 22–129 € spread, so every
-// band matches at least one SKU.
-export type PriceBand = "all" | "under50" | "mid" | "high";
+// Price-band facet. Bounds follow the catalog's actual 2 200–12 900 DA spread,
+// so every band matches at least one SKU.
+export type PriceBand = "all" | "under5000" | "mid" | "high";
 
 export const priceBandOf = (price: number, band: PriceBand) => {
   if (band === "all") return true;
-  if (band === "under50") return price < 50;
-  if (band === "mid") return price >= 50 && price < 100;
-  return price >= 100;
+  if (band === "under5000") return price < 5000;
+  if (band === "mid") return price >= 5000 && price < 10000;
+  return price >= 10000;
 };
-
-// Rating-floor facet. The seeded ratings occupy 4.0–4.8, so both floors land
-// inside that range and each one removes something visible.
-export type RatingFloor = "all" | "r42" | "r45";
-
-export const ratingFloorValue: Record<Exclude<RatingFloor, "all">, number> = {
-  r42: 4.2,
-  r45: 4.5,
-};
-
-export const meetsRating = (rating: number, floor: RatingFloor) =>
-  floor === "all" || rating >= ratingFloorValue[floor];
 
 /* ------------------------------------------------------------------ *
  * Detail data. Every value below is mock catalogue content for a
@@ -75,25 +64,6 @@ export const meetsRating = (rating: number, floor: RatingFloor) =>
  * claims (1080P, 9000 Pa, H7 6000 K, 12 V 3000 A) rather than inventing
  * new engineering precision. Labels are i18n keys, values stay neutral.
  * ------------------------------------------------------------------ */
-
-export type ColorwayKey = "black" | "grey" | "light" | "red";
-
-export const COLORWAYS: Record<ColorwayKey, string> = {
-  black: "bg-obsidian",
-  grey: "bg-slate",
-  light: "bg-line",
-  red: "bg-sale",
-};
-
-const COLORWAY_ORDER: ColorwayKey[] = ["black", "grey", "light", "red"];
-
-export const colorwaysOf = (product: Product): ColorwayKey[] => {
-  const seed = Number(product.id.replace(/\D/g, "")) || 1;
-  return COLORWAY_ORDER.slice(0, 2 + (seed % 3));
-};
-
-export const defaultColorway = (product: Product): ColorwayKey =>
-  colorwaysOf(product)[0];
 
 export type SpecRow = { labelKey: string; value: string };
 
@@ -218,71 +188,17 @@ export const relatedOf = (product: Product, limit = 4): Product[] => {
 };
 
 /* ------------------------------------------------------------------ *
- * Pricing. Mock rules, applied identically everywhere in the app.
+ * Pricing. Cash on delivery, free delivery — the total is the subtotal.
  * ------------------------------------------------------------------ */
-
-export type ShippingMethod = "standard" | "express" | "pickup";
-
-export const SHIPPING: Record<
-  ShippingMethod,
-  { cost: number; freeFrom: number; days: number; etaKey: string }
-> = {
-  standard: { cost: 4.9, freeFrom: 60, days: 2, etaKey: "shipping.standard.eta" },
-  express: { cost: 9.9, freeFrom: 150, days: 1, etaKey: "shipping.express.eta" },
-  pickup: { cost: 0, freeFrom: 0, days: 0, etaKey: "shipping.pickup.eta" },
-};
-
-export type PromoCode = {
-  code: string;
-  kind: "percent" | "shipping";
-  value: number;
-  minSubtotal: number;
-};
-
-export const PROMOS: PromoCode[] = [
-  { code: "HANU10", kind: "percent", value: 10, minSubtotal: 0 },
-  { code: "GARAGE25", kind: "percent", value: 25, minSubtotal: 120 },
-  { code: "PORTOFFERT", kind: "shipping", value: 100, minSubtotal: 40 },
-];
 
 export type Totals = {
   subtotal: number;
-  discount: number;
-  shipping: number;
   total: number;
   itemCount: number;
-  shippingWaived: boolean;
 };
 
-export const totalsFor = (
-  lines: { product: Product; qty: number }[],
-  shippingMethod: ShippingMethod = "standard",
-  promoCode?: string | null,
-): Totals => {
+export const totalsFor = (lines: { product: Product; qty: number }[]): Totals => {
   const subtotal = lines.reduce((sum, l) => sum + l.product.price * l.qty, 0);
   const itemCount = lines.reduce((sum, l) => sum + l.qty, 0);
-  const promo = promoCode
-    ? PROMOS.find((p) => p.code === promoCode.toUpperCase())
-    : undefined;
-  const promoApplies = !!promo && subtotal >= promo.minSubtotal && itemCount > 0;
-
-  const discount =
-    promoApplies && promo!.kind === "percent"
-      ? Math.round(subtotal * promo!.value) / 100
-      : 0;
-
-  const rule = SHIPPING[shippingMethod];
-  const net = subtotal - discount;
-  const shippingWaived =
-    itemCount === 0 || net >= rule.freeFrom || (promoApplies && promo!.kind === "shipping");
-  const shipping = shippingWaived ? 0 : rule.cost;
-
-  return {
-    subtotal,
-    discount,
-    shipping,
-    total: Math.max(0, net + shipping),
-    itemCount,
-    shippingWaived,
-  };
+  return { subtotal, total: subtotal, itemCount };
 };

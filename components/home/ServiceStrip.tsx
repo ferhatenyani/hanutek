@@ -29,7 +29,7 @@ export default function ServiceStrip() {
               <item.Icon
                 size={20}
                 aria-hidden="true"
-                className="mt-px shrink-0 text-obsidian"
+                className="mt-px shrink-0 text-blue"
               />
               <span>
                 <span className="block text-[13.5px] font-semibold text-obsidian">

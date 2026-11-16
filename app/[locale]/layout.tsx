@@ -8,7 +8,10 @@ import { routing } from "@/i18n/routing";
 import AppDock from "@/components/shell/AppDock";
 import Footer from "@/components/footer/Footer";
 import HydrationMarker from "@/components/shell/HydrationMarker";
+import MotionProvider from "@/components/shell/MotionProvider";
 import Navbar from "@/components/navbar/Navbar";
+import ShopSheet from "@/components/sheet/ShopSheet";
+import StoreHydrator from "@/components/shell/StoreHydrator";
 import Toaster from "@/components/ui/Toaster";
 import "../globals.css";
 
@@ -49,12 +52,9 @@ export async function generateMetadata({
 
 export default async function LocaleLayout({
   children,
-  modal,
   params,
 }: {
   children: React.ReactNode;
-  /** Parallel slot: intercepted routes render here as sliding sheets. */
-  modal?: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
@@ -72,6 +72,7 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-obsidian">
         <NextIntlClientProvider>
+          <MotionProvider>
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[var(--z-toast)] focus:rounded-control focus:bg-obsidian focus:px-4 focus:py-2.5 focus:text-[13px] focus:font-semibold focus:text-white"
@@ -92,13 +93,15 @@ export default async function LocaleLayout({
           <Footer />
 
           <Suspense fallback={null}>
+            <StoreHydrator />
             <AppDock />
-            {modal}
+            <ShopSheet />
             <Toaster />
             {/* Inside the boundary on purpose: the marker must only fire once
                 the shared chrome has actually rendered, not merely hydrated. */}
             <HydrationMarker />
           </Suspense>
+          </MotionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

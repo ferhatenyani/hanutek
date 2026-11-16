@@ -44,7 +44,7 @@ export default function QtyStepper({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-full border p-0.5",
+        "inline-flex items-center gap-0.5 rounded-control border p-0.5",
         box,
         solid
           ? "border-brand/15 bg-brand-soft text-brand-deep"
@@ -60,7 +60,7 @@ export default function QtyStepper({
         disabled={disabled || value <= min}
         aria-label={t("decrease")}
         className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-30",
+          "flex h-9 w-9 items-center justify-center rounded-control transition-colors disabled:cursor-not-allowed disabled:opacity-30",
           solid ? "hover:bg-white" : "hover:bg-mist",
         )}
       >
@@ -82,7 +82,7 @@ export default function QtyStepper({
         disabled={disabled || value >= max}
         aria-label={t("increase")}
         className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-30",
+          "flex h-9 w-9 items-center justify-center rounded-control transition-colors disabled:cursor-not-allowed disabled:opacity-30",
           solid ? "hover:bg-white" : "hover:bg-mist",
         )}
       >

@@ -1,38 +1,40 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
 import { cartStore, useInCart } from "@/lib/cart-store";
 import { favoritesStore, useIsFavorite } from "@/lib/favorites-store";
-import { defaultColorway, type Product } from "@/lib/products";
-import { toastStore } from "@/lib/toast-store";
+import type { Product } from "@/lib/products";
+
+/** Custom event the header cart icon listens to for the fly-to-cart dot. */
+export const FLY_EVENT = "hanutek:fly-to-cart";
+
+export function flyToCart(from: HTMLElement) {
+  const rect = from.getBoundingClientRect();
+  window.dispatchEvent(
+    new CustomEvent(FLY_EVENT, {
+      detail: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
+    }),
+  );
+}
 
 /**
  * Card-level cart and favourite state. The transient "just added" pulse is kept
- * apart from `inCart`, which is the truth from the persisted cart: a card stays
- * marked once its product is in the basket.
+ * apart from `inCart`, which is the truth from the persisted cart.
  */
-export function useCardCart(product: Product, title: string) {
+export function useCardCart(product: Product) {
   const fav = useIsFavorite(product.id);
   const inCart = useInCart(product.id);
-  const locale = useLocale();
-  const tc = useTranslations("cart");
   const [justAdded, setJustAdded] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
-  const addToCart = () => {
-    cartStore.add(product.id, 1, defaultColorway(product));
+  const addToCart = (source?: HTMLElement | null) => {
+    cartStore.add(product.id, 1);
+    if (source) flyToCart(source);
     setJustAdded(true);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setJustAdded(false), 1800);
-    toastStore.push({
-      message: tc("addedToast", { qty: 1, title }),
-      tone: "success",
-      actionLabel: tc("viewCart"),
-      href: `/${locale}/cart`,
-    });
+    timer.current = window.setTimeout(() => setJustAdded(false), 1600);
   };
 
   const toggleFav = () => favoritesStore.toggle(product.id);

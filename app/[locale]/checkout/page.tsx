@@ -1,17 +1,6 @@
-import CheckoutFlow from "@/components/checkout/CheckoutFlow";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "checkout" });
-  return { title: t("metaTitle"), description: t("metaDescription") };
-}
-
+/** Checkout lives inside the shared bottom sheet; this spacer keeps the URL valid. */
 export default async function CheckoutRoute({
   params,
 }: {
@@ -19,5 +8,5 @@ export default async function CheckoutRoute({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <CheckoutFlow />;
+  return <div aria-hidden="true" className="min-h-[70dvh]" />;
 }

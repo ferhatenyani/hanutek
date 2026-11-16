@@ -1,42 +1,54 @@
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { productById } from "./products";
-import { createStore, useStore } from "./store";
 
-type FavoritesState = { ids: string[] };
-
-const EMPTY: FavoritesState = { ids: [] };
-const store = createStore<FavoritesState>(EMPTY, { persist: "favorites" });
-
-// A favourite whose product left the catalogue must not render an empty card.
-const sanitize = (state: FavoritesState): FavoritesState => {
-  const ids = state.ids.filter((id) => !!productById(id));
-  return ids.length === state.ids.length ? state : { ids };
+type FavoritesState = {
+  ids: string[];
+  toggle: (id: string) => void;
+  remove: (id: string) => void;
+  clear: () => void;
 };
 
-store.set(sanitize(store.get()));
+export const useFavoritesStore = create<FavoritesState>()(
+  persist(
+    (set, get) => ({
+      ids: [],
+      toggle(id) {
+        const { ids } = get();
+        set({ ids: ids.includes(id) ? ids.filter((x) => x !== id) : [id, ...ids] });
+      },
+      remove(id) {
+        set({ ids: get().ids.filter((x) => x !== id) });
+      },
+      clear() {
+        set({ ids: [] });
+      },
+    }),
+    {
+      name: "hanutek:v2:favorites",
+      storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
+      partialize: (s) => ({ ids: s.ids }),
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<FavoritesState>;
+        return { ...current, ids: (p.ids ?? []).filter((id) => !!productById(id)) };
+      },
+    },
+  ),
+);
 
 export const favoritesStore = {
-  get: () => store.get(),
-  set: store.set,
-  subscribe: store.subscribe,
-
-  toggle(id: string) {
-    const { ids } = store.get();
-    store.set({
-      ids: ids.includes(id) ? ids.filter((x) => x !== id) : [id, ...ids],
-    });
-  },
-  remove(id: string) {
-    store.set({ ids: store.get().ids.filter((x) => x !== id) });
-  },
-  clear() {
-    store.set(EMPTY);
-  },
+  get: useFavoritesStore.getState,
+  subscribe: useFavoritesStore.subscribe,
+  toggle: (id: string) => useFavoritesStore.getState().toggle(id),
+  remove: (id: string) => useFavoritesStore.getState().remove(id),
+  clear: () => useFavoritesStore.getState().clear(),
 };
 
 export function useFavorites(): string[] {
-  return useStore(store).ids;
+  return useFavoritesStore((s) => s.ids);
 }
 
 export function useIsFavorite(id: string): boolean {
-  return useStore(store).ids.includes(id);
+  return useFavoritesStore((s) => s.ids.includes(id));
 }

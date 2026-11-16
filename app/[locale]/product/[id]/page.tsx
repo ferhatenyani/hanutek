@@ -1,4 +1,3 @@
-import ProductPage from "@/components/products/ProductPage";
 import { productById, products } from "@/lib/products";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -26,6 +25,7 @@ export async function generateMetadata({
   };
 }
 
+/** The product story is a step of the shared bottom sheet, not a page. */
 export default async function ProductRoute({
   params,
 }: {
@@ -33,8 +33,6 @@ export default async function ProductRoute({
 }) {
   const { id, locale } = await params;
   setRequestLocale(locale);
-  const product = productById(id);
-  if (!product) notFound();
-
-  return <ProductPage product={product} />;
+  if (!productById(id)) notFound();
+  return <div aria-hidden="true" className="min-h-[70dvh]" />;
 }

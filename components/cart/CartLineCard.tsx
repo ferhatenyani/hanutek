@@ -6,80 +6,50 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import QtyStepper from "@/components/ui/QtyStepper";
 import { cartStore, type ResolvedLine } from "@/lib/cart-store";
-import { COLORWAYS } from "@/lib/products";
-import { toastStore } from "@/lib/toast-store";
-import { cn } from "@/lib/utils";
+import { formatDA } from "@/lib/money";
 
-/**
- * Cart line as a soft, horizontal row: media, identity, quantity, price and a
- * quiet remove control. Out-of-stock lines keep their place with a visible
- * warning rather than disappearing from the order.
- */
+/** Cart line: media, identity, quantity, price and a quiet remove control. */
 export default function CartLineCard({ line }: { line: ResolvedLine }) {
   const t = useTranslations("cart");
   const tp = useTranslations("products");
-  const tpr = useTranslations("product");
   const locale = useLocale();
 
-  const { product, qty, colorway, lineTotal } = line;
-  const format = new Intl.NumberFormat(locale === "ar" ? "ar-MA" : "fr-FR", {
-    style: "currency",
-    currency: "EUR",
-  });
+  const { product, qty, lineTotal } = line;
   const soldOut = !product.inStock;
   const title = tp(`items.${product.id}.title` as "items.p1.title");
-
-  const remove = () => {
-    cartStore.remove(line.key);
-    toastStore.push({
-      message: t("removedToast", { title }),
-      tone: "neutral",
-    });
-  };
 
   return (
     <article data-testid="cart-line" className="flex gap-3.5 px-4 py-4 sm:gap-4 sm:px-5">
       <Link
         href={`/${locale}/product/${product.id}`}
-        className="relative h-[92px] w-[92px] shrink-0 overflow-hidden rounded-soft-sm bg-mist ring-1 ring-inset ring-ink/[0.05] sm:h-[104px] sm:w-[104px]"
+        className="relative h-[84px] w-[84px] shrink-0 overflow-hidden rounded-control bg-mist ring-1 ring-inset ring-ink/[0.05] sm:h-[96px] sm:w-[96px]"
       >
-        <Image src={product.image} alt={title} fill sizes="104px" className="object-cover" />
+        <Image src={product.image} alt={title} fill sizes="96px" className="object-cover" />
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted rtl:tracking-normal">
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-faint rtl:tracking-normal">
               {product.brand}
             </p>
-            <h3 className="mt-1 line-clamp-2 text-[14px] font-semibold leading-[1.35] text-ink">
-              <Link href={`/${locale}/product/${product.id}`} className="transition-colors hover:text-brand">
+            <h3 className="mt-0.5 line-clamp-2 text-[13.5px] font-semibold leading-[1.35] text-ink">
+              <Link href={`/${locale}/product/${product.id}`} className="transition-colors hover:text-blue">
                 {title}
               </Link>
             </h3>
-            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px] text-muted">
-              <span className="flex items-center gap-1.5">
-                <span
-                  aria-hidden="true"
-                  className={cn("h-3 w-3 rounded-full ring-1 ring-inset ring-ink/15", COLORWAYS[colorway])}
-                />
-                {t("colorway", {
-                  color: tpr(`colors.${colorway}` as "colors.black"),
-                })}
+            {soldOut && (
+              <span className="mt-1.5 inline-block rounded-control bg-sale-soft px-2 py-0.5 text-[10.5px] font-semibold text-sale">
+                {t("soldOutLine")}
               </span>
-              {soldOut && (
-                <span className="rounded-full bg-sale/10 px-2 py-0.5 text-[10.5px] font-semibold text-sale">
-                  {t("soldOutLine")}
-                </span>
-              )}
-            </p>
+            )}
           </div>
 
           <button
             type="button"
-            onClick={remove}
+            onClick={() => cartStore.remove(line.key)}
             aria-label={t("remove", { title })}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-sale/8 hover:text-sale"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control text-muted transition-colors hover:bg-sale-soft hover:text-sale"
           >
             <Trash size={15} aria-hidden="true" />
           </button>
@@ -96,11 +66,11 @@ export default function CartLineCard({ line }: { line: ResolvedLine }) {
           />
 
           <div className="text-end">
-            <p dir="ltr" className="text-[16px] font-bold leading-none num text-ink">
-              {format.format(lineTotal)}
+            <p dir="ltr" className="num text-[15px] font-bold leading-none text-ink">
+              {formatDA(lineTotal, locale)}
             </p>
-            <p dir="ltr" className="mt-1 text-[10.5px] num text-muted">
-              {format.format(product.price)} · {t("eachQty", { qty })}
+            <p dir="ltr" className="num mt-1 text-[10.5px] text-muted">
+              {formatDA(product.price, locale)} · {t("eachQty", { qty })}
             </p>
           </div>
         </div>

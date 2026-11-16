@@ -3,8 +3,7 @@
 import { IconButton } from "@/components/ui/Button";
 import { X } from "@phosphor-icons/react";
 import { motion, useDragControls } from "motion/react";
-import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDialog, useMediaQuery, useMounted, useScrollLock } from "@/lib/hooks";
@@ -15,63 +14,48 @@ type SheetProps = {
   /** Accessible name of the surface, e.g. the product title. */
   title: string;
   onClose: () => void;
-  /** `full` owns the whole viewport on mobile; `sheet` keeps a strip of context. */
-  size?: "sheet" | "full";
-  /**
-   * Desktop presentation: a centered dialog for product stories, a right-hand
-   * panel for cart-like workflows. Phones and tablets always get a bottom sheet.
-   */
-  placement?: "dialog" | "panel";
   eyebrow?: string;
   headerExtra?: React.ReactNode;
   /** Sticky action bar. Kept outside the scroll area so it never scrolls away. */
   footer?: React.ReactNode;
+  /** Host-driven dismissal: play the exit without unmounting yet. */
+  exiting?: boolean;
   className?: string;
   children: React.ReactNode;
 };
 
+/**
+ * The one bottom sheet of the app, at every breakpoint: a strip of blurred
+ * context above, curved top corners, drag-to-dismiss on touch. Desktop centres
+ * it in a 680px column instead of stretching edge to edge.
+ */
 export default function Sheet({
   title,
   onClose,
-  size = "sheet",
-  placement = "dialog",
   eyebrow,
   headerExtra,
   footer,
+  exiting = false,
   className,
   children,
 }: SheetProps) {
   const mounted = useMounted();
   const compact = useMediaQuery("(max-width: 1023px)");
   const t = useTranslations("common");
-  const locale = useLocale();
-  const pathname = usePathname();
-  const [openedAt] = useState(pathname);
-  const full = size === "full";
   const [phase, setPhase] = useState<"enter" | "settled" | "exit">("enter");
-  const [gone, setGone] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const controls = useDragControls();
   const titleId = useId();
   const timers = useRef<number[]>([]);
-  const rtl = locale === "ar";
 
   const handleClose = () => {
     if (phase === "exit") return;
     setPhase("exit");
-    timers.current.push(
-      window.setTimeout(() => {
-        // Unmount our own portal: a back navigation leaves the parallel slot's
-        // tree mounted, which would keep an invisible dialog in the DOM.
-        setGone(true);
-        onClose();
-      }, 250),
-    );
+    timers.current.push(window.setTimeout(onClose, 240));
   };
 
-  const dialogRef = useDialog<HTMLDivElement>(mounted && !gone, handleClose);
-  // Releasing the lock is what lets the page the sheet navigated to scroll.
-  useScrollLock(mounted && !gone && pathname === openedAt);
+  const dialogRef = useDialog<HTMLDivElement>(mounted, handleClose);
+  useScrollLock(mounted);
 
   useEffect(() => {
     const settle = window.setTimeout(() => setPhase("settled"), 420);
@@ -82,42 +66,22 @@ export default function Sheet({
     };
   }, []);
 
-  // A link inside the sheet can navigate without going through handleClose, and
-  // Next then keeps this slot's tree mounted. Left standing, its full-screen
-  // layer would silently swallow every pointer event on the page behind it, so
-  // the portal drops as soon as the route is no longer the one that opened it.
-  if (!mounted || gone || pathname !== openedAt) return null;
+  if (!mounted) return null;
 
-  const dragging = compact && !full && phase !== "exit";
-  const panel = !compact && placement === "panel";
-  const enter = compact
-    ? { y: "100%" }
-    : panel
-      ? { x: rtl ? "-100%" : "100%" }
-      : { y: 26, scale: 0.975, opacity: 0 };
-  const exit = compact
-    ? { y: "100%" }
-    : panel
-      ? { x: rtl ? "-100%" : "100%" }
-      : { y: 20, scale: 0.985, opacity: 0 };
-  const rest = compact
-    ? { y: 0 }
-    : panel
-      ? { x: 0 }
-      : { y: 0, scale: 1, opacity: 1 };
+  const leaving = phase === "exit" || exiting;
+  const dragging = compact && !leaving;
 
   return createPortal(
-    <div className="fixed inset-0 z-[var(--z-sheet)]">
+    <div className="fixed inset-0 z-[var(--z-sheet)] flex items-end justify-center">
       <motion.div
         data-testid="sheet-scrim"
         aria-hidden="true"
-        // touch-action is what stops a swipe on the scrim from scrolling the
-        // page behind it; the root overflow lock covers the other gestures.
         style={{ touchAction: "none" }}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-[6px]"
+        className="absolute inset-0 bg-ink/30 backdrop-blur-[8px]"
         initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "exit" ? 0 : 1 }}
-        transition={{ duration: phase === "exit" ? 0.22 : DUR.micro, ease: EASE }}
+        animate={{ opacity: leaving ? 0 : 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: leaving ? 0.22 : DUR.micro, ease: EASE }}
         onClick={handleClose}
       />
 
@@ -137,31 +101,25 @@ export default function Sheet({
         onDragEnd={(_, info) => {
           if (info.offset.y > 110 || info.velocity.y > 750) handleClose();
         }}
-        initial={enter}
-        animate={phase === "exit" ? exit : rest}
+        initial={{ y: "100%" }}
+        animate={{ y: leaving ? "100%" : 0 }}
+        exit={{ y: "100%" }}
         transition={
-          phase === "exit"
+          leaving
             ? { duration: 0.24, ease: EASE }
             : { type: "spring", stiffness: 320, damping: 34, mass: 0.9 }
         }
         className={cn(
-          "absolute inset-x-0 bottom-0 flex flex-col overflow-hidden bg-white shadow-sheet outline-none",
-          full
-            ? "h-[100dvh] rounded-none"
-            : "h-[90dvh] max-h-[calc(100dvh-1.5rem)] rounded-t-sheet",
-          panel
-            ? "lg:inset-y-0 lg:end-0 lg:start-auto lg:bottom-0 lg:h-[100dvh] lg:max-h-none lg:w-[min(460px,100%)] lg:rounded-none lg:rounded-s-sheet lg:shadow-pop"
-            : "lg:inset-0 lg:m-auto lg:h-[min(90dvh,860px)] lg:max-h-none lg:w-[min(1040px,calc(100%-3rem))] lg:rounded-sheet lg:shadow-pop",
+          "relative flex h-[calc(100dvh-0.75rem)] w-full flex-col overflow-hidden rounded-t-sheet bg-white shadow-sheet outline-none sm:h-[calc(100dvh-1.25rem)] lg:h-[calc(100dvh-2.5rem)]",
           className,
         )}
       >
         {/* The grabber is the drag handle, so the scroll area keeps its own gesture. */}
         <div
           className={cn(
-            "flex shrink-0 justify-center pt-2.5 lg:hidden",
-            !full && "cursor-grab active:cursor-grabbing",
+            "flex shrink-0 cursor-grab justify-center pt-2.5 active:cursor-grabbing lg:hidden",
           )}
-          style={{ touchAction: full ? "auto" : "none" }}
+          style={{ touchAction: "none" }}
           onPointerDown={(event) => {
             if (dragging) controls.start(event);
           }}
@@ -171,14 +129,13 @@ export default function Sheet({
 
         <header
           className={cn(
-            "relative z-[var(--z-sheet-content)] flex shrink-0 items-start gap-3 bg-white/95 px-4 backdrop-blur-xl transition-shadow duration-200 sm:px-6 lg:pt-5",
-            full ? "pt-3.5 pb-3" : "pt-2.5 pb-3",
-            scrolled && "shadow-[0_12px_28px_-24px_rgba(16,24,40,0.5)]",
+            "relative z-[var(--z-sheet-content)] flex shrink-0 items-start gap-3 bg-white/95 px-4 pb-3 pt-2.5 backdrop-blur-xl transition-shadow duration-200 sm:px-6 lg:pt-5",
+            scrolled && "shadow-[0_12px_28px_-24px_rgba(11,13,16,0.5)]",
           )}
         >
           <div className="min-w-0 flex-1">
             {eyebrow && (
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand rtl:tracking-normal">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-blue rtl:tracking-normal">
                 {eyebrow}
               </p>
             )}
@@ -200,7 +157,7 @@ export default function Sheet({
           <IconButton
             label={t("close")}
             onClick={handleClose}
-            className="-me-1 mt-0.5 h-10 w-10 bg-mist text-muted hover:bg-brand-soft hover:text-brand"
+            className="-me-1 mt-0.5 h-10 w-10 bg-mist text-muted hover:bg-blue-soft hover:text-blue"
           >
             <X size={18} aria-hidden="true" />
           </IconButton>
@@ -217,7 +174,7 @@ export default function Sheet({
         </div>
 
         {footer && (
-          <footer className="shrink-0 border-t border-hairline bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
+          <footer className="shrink-0 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
             {footer}
           </footer>
         )}

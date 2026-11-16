@@ -2,22 +2,51 @@ import { expect, test } from "@playwright/test";
 import { AR, FR, addCard, dockBadge, dockGoto, gotoClean, watchErrors } from "./helpers";
 
 test.describe("storefront shell", () => {
-  test("home renders hero, browse, curated grid and service band", async ({ page }) => {
+  test("home renders the promo deck, two dot-paginated rails and the service band", async ({
+    page,
+  }) => {
     const watcher = watchErrors(page);
     await gotoClean(page, FR);
 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(
-      page.getByRole("region", { name: "Parcourir par catégorie" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Coups de cœur" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Nouveautés & essentiels" })).toBeVisible();
 
-    const cards = page.getByTestId("product-card");
-    await expect(cards).toHaveCount(8);
+    // Six cards per rail, all mounted in the horizontal scroll rows.
+    await expect(page.getByTestId("product-card")).toHaveCount(12);
+    await expect(page.getByRole("link", { name: "Voir plus" })).toHaveCount(2);
 
-    await expect(page.getByRole("link", { name: "Voir les 12 produits" })).toBeVisible();
+    // Dots: two for the promo deck plus six per rail; arrows for both rails.
+    await expect(page.getByRole("tab")).toHaveCount(14);
+    await expect(page.getByRole("button", { name: "Articles suivants" })).toHaveCount(2);
+
     await expect(page.getByRole("heading", { name: "Notre engagement" })).toBeAttached();
     await expect(page.getByText("Commande préparée le jour même avant 15 h.")).toBeVisible();
     watcher.expectClean();
+  });
+
+  test("rail dots and arrows page the horizontal section", async ({ page }) => {
+    await gotoClean(page, FR);
+    const rail = page.getByTestId("rail-scroll").first();
+    const before = await rail.evaluate((node) => node.scrollLeft);
+    await page.getByRole("button", { name: "Articles suivants" }).first().click();
+    await expect
+      .poll(() => rail.evaluate((node) => node.scrollLeft))
+      .toBeGreaterThan(before);
+  });
+
+  test("the header search offers real suggestions and opens the product sheet", async ({
+    page,
+  }) => {
+    await gotoClean(page, FR);
+    const search = page.locator("header").locator("input[role='combobox']:visible").first();
+    await search.fill("caméra");
+    const listbox = page.getByRole("listbox", { name: "Suggestions de recherche" });
+    await expect(listbox).toBeVisible();
+    await expect(listbox.getByRole("option").first()).toBeVisible();
+    await listbox.getByRole("option").first().click();
+    await expect(page).toHaveURL(/\/fr\/product\/p\d+$/);
+    await expect(page.getByTestId("sheet-panel")).toBeVisible();
   });
 
   test("navigation reflects the current route and the device", async ({ page }) => {
@@ -102,43 +131,38 @@ test.describe("catalogue", () => {
     await expect(page.getByText("2 articles", { exact: true })).toBeVisible();
   });
 
-  test("price, rating and stock facets each narrow the grid", async ({ page }) => {
-    // Phones and tablets keep the full facet set in a sheet; desktop shows the
-    // same controls in the sticky filter rail.
+  test("price and stock facets each narrow the grid", async ({ page }) => {
+    // Phones and tablets keep the facet set in a sheet; desktop shows the same
+    // controls in the independently scrolling filter rail.
     const openFilters = page.getByRole("button", { name: "Filtres", exact: true });
     const sheet = await openFilters.isVisible().catch(() => false);
     if (sheet) await openFilters.click();
     const scope = sheet ? page.getByRole("dialog") : page;
 
-    await scope.getByRole("button", { name: "Moins de 50 €" }).click();
-    const afterPrice = await page.getByTestId("product-card").count();
-    expect(afterPrice).toBeLessThan(12);
+    await scope.getByRole("button", { name: "5 000 - 9 999 DA" }).click();
+    await expect(page.getByTestId("product-card")).toHaveCount(5);
 
-    await scope.getByRole("button", { name: "4,5 et plus" }).click();
-    const afterRating = await page.getByTestId("product-card").count();
-    expect(afterRating).toBeLessThanOrEqual(afterPrice);
-
-    await scope.getByRole("button", { name: "En stock uniquement" }).click();
-    expect(await page.getByTestId("product-card").count()).toBeLessThanOrEqual(afterRating);
+    await scope.getByRole("switch", { name: "En stock" }).click();
+    await expect(page.getByTestId("product-card")).toHaveCount(3);
   });
 
   test("sorting reorders by price", async ({ page }) => {
     await page.getByRole("button", { name: /Trier les produits/ }).click();
     await page.getByRole("option", { name: "Prix croissant" }).click();
-    await expect(page.getByTestId("product-card").first()).toContainText("22,00");
+    await expect(page.getByTestId("product-card").first()).toContainText(/2\s200\sDA/);
   });
 
   test("search narrows the grid and can be cleared", async ({ page }) => {
-    const search = page.getByRole("searchbox", { name: "Rechercher dans le catalogue" });
+    const search = page.locator("main").getByRole("combobox");
     await search.fill("gonfleur");
     await expect(page.getByTestId("product-card")).toHaveCount(1);
 
-    await page.getByRole("button", { name: "Effacer la recherche" }).click();
+    await page.locator("main").getByRole("button", { name: "Effacer la recherche" }).click();
     await expect(page.getByTestId("product-card")).toHaveCount(12);
   });
 
   test("an impossible combination shows the empty state with a reset", async ({ page }) => {
-    await page.getByRole("searchbox", { name: "Rechercher dans le catalogue" }).fill("zzzz");
+    await page.locator("main").getByRole("combobox").fill("zzzz");
     await expect(page.getByText("Aucun produit ne correspond")).toBeVisible();
     await page.getByRole("button", { name: "Réinitialiser" }).last().click();
     await expect(page.getByTestId("product-card")).toHaveCount(12);
@@ -153,9 +177,10 @@ test.describe("catalogue", () => {
   test("deep link ?cat= preselects the category", async ({ page }) => {
     await page.goto(`${FR}/products?cat=power`);
     await expect(page.getByTestId("product-card")).toHaveCount(3);
-    await expect(page.getByRole("button", { name: "Démarrage & diagnostic" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    // The rail button's accessible name carries its count; the chip-remove
+    // button's label starts with "Retirer", so anchor at the start.
+    await expect(
+      page.getByRole("button", { name: /^Démarrage & diagnostic/ }),
+    ).toHaveAttribute("aria-pressed", "true");
   });
 });

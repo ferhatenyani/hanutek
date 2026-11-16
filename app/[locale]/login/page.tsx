@@ -1,4 +1,5 @@
 import LoginForm from "@/components/account/LoginForm";
+import PageSkeleton from "@/components/shell/PageSkeleton";
 import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 
@@ -11,11 +12,7 @@ export default async function LoginRoute({
   setRequestLocale(locale);
 
   return (
-    <Suspense
-      fallback={
-        <div className="mx-auto my-10 h-[520px] w-full max-w-[1120px] animate-pulse rounded-sheet bg-white/70" />
-      }
-    >
+    <Suspense fallback={<PageSkeleton variant="form" />}>
       <LoginForm />
     </Suspense>
   );
